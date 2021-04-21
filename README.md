@@ -4,7 +4,7 @@ This a project that use R to deal with RedCap data.
 To install the 'bsrc' package, you will need the package 'devtools'
 ```
 library("devtools")
-devtools::install_github("DecisionNeurosciencePsychopathology/redcap_in_r")
+devtools::install_github("PROTECT-lab/redcap_in_r")
 objects("package:bsrc")
 ```
 **Before use of the package, you will need a profile for each RedCap connection**
