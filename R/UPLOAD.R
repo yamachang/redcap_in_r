@@ -1,4 +1,18 @@
-##########################
+#Basics:
+#' redcap_uri=ptcs$protect$redcap_uri
+#' token=ptcs$protect$token
+#' 
+#' action = NULL
+#' content = NULL
+#' arms = NULL
+#' records = NULL
+#' fields = NULL
+#' 
+#' message = TRUE
+
+
+
+
 redcap_api_call<-function (redcap_uri=NULL, token=NULL,
                            action = NULL, content = NULL,
                            records = NULL,arms = NULL,events=NULL, forms=NULL, fields = NULL,
@@ -78,7 +92,44 @@ redcap_api_call<-function (redcap_uri=NULL, token=NULL,
   return(list(output=ds,success=FALSE))
 }
 
-#########################
+
+redcap_get_large_records <- function(redcap_uri = NULL,post_body=NULL,record_list=NULL,batch_size=1000L,carryon = FALSE ) {
+  record_list$output$count<-ceiling(1:nrow(record_list$output)/batch_size)
+  records_evt_fixed<-do.call(rbind,lapply(split(record_list$output,record_list$output$registration_redcapid),function(dfx){
+    if(length(unique(dfx$count))!=1) {
+      dfx$count<-round(median(dfx$count),digits = 0)
+      }
+    return(dfx)
+    }))
+  records_sp<-split(records_evt_fixed,records_evt_fixed$count)
+  message("pulling large records in batchs")  
+  ifTerminate <- FALSE
+  output_sum<-cleanuplist(lapply(records_sp,function(tgt){
+    if(ifTerminate && !carryon) {return(NULL)}
+    message("pulling batch ",unique(tgt$count)," out of ",max(records_evt_fixed$count))
+    output<-redcap_api_call(redcap_uri = redcap_uri, post_body = post_body, 
+                            content = "record",
+                            records = unique(tgt$registration_redcapid),
+                            action = "record_single_run")
+    if(!output$success || !is.data.frame(output$output)) {
+      message("failed, error message is: ",output$output)
+      ifTerminate <<- TRUE
+      return(list(IDarray = unique(tgt$registration_redcapid),batch_number = unique(tgt$count),success = FALSE,output = output$output))
+      }
+    return(output$output)
+  }))
+  if(!ifTerminate) {
+    return(list(output = do.call(rbind,output_sum),success = TRUE))
+  } else if (carryon) {
+    message("the function carried on after encounter error. will return reminder and error informations.")
+    output_isDone <- split(output_sum,sapply(output_sum,is.data.frame))
+    return(list(output = do.call(rbind,output_isDone$`TRUE`),success = FALSE, error_outcome = output_isDone$`FALSE`))
+  } else {
+    return(list(output = NULL, success = FALSE, error_outcome = last(output_sum)))
+  }
+}
+
+
 redcap_upload<-function (ds_to_write, batch_size = 100L, interbatch_delay = 0.5, retry_whenfailed=T,
                          continue_on_error = FALSE, redcap_uri, token, verbose = TRUE, NAoverwrite = F,
                          config_options = NULL) 
@@ -213,5 +264,59 @@ redcap_oneshot_upload<-function (ds, redcap_uri, token, verbose = TRUE, NAoverwr
   return(list(success = success, status_code = status_code, 
               outcome_message = outcome_message, records_affected_count = recordsAffectedCount, 
               affected_ids = affectedIDs, elapsed_seconds = elapsed_seconds, excludedIDs = excludedIDs,
+              raw_text = raw_text))
+}
+
+redcap_seq_uplaod<-function(ds=NULL,id.var=NULL,redcap_uri,token,batch_size=1000L) {
+  ds_sp<-split(ds,do.call(paste,c(ds[id.var],sep="_")))
+  gt <- lapply(ds_sp,function(gx){gx[!apply(gx,2,is.na)]})
+  gt_u_names<-unique(lapply(gt,names))
+  gt_u_index <- sapply(gt,function(gtx){match(list(names(gtx)),gt_u_names)})
+  gyat<-lapply(1:length(gt_u_names),function(g){
+    message("uploading ",g," out of ",length(gt_u_names))
+    redcap_write(ds_to_write = do.call(rbind,gt[which(gt_u_index == g)]),batch_size = batch_size,redcap_uri = redcap_uri,token = token,continue_on_error = T)
+  })
+  return(
+    list(affected_ids=unlist(sapply(gyat,`[[`,"affected_ids"),use.names = F),outcome_message = unlist(sapply(gyat,`[[`,"outcome_message"),use.names = F))
+  )
+}
+
+
+redcap.getreport<-function(redcap_uri, token, reportid = NULL, message = TRUE, config_options = NULL) {
+  start_time <- Sys.time()
+  if (missing(redcap_uri))  {
+    stop("The required parameter `redcap_uri` was missing from the call to `redcap.getreport`.") }
+  if (missing(token)) {
+    stop("The required parameter `token` was missing from the call to `redcap.getreport`.") }
+  #token <- REDCapR::sanitize_token(token)
+  post_body <- list(token = token, content = "report", format = "csv", report_id=as.character(reportid))
+  result <- httr::POST(url = redcap_uri, body = post_body, 
+                       config = config_options)
+  status_code <- result$status
+  success <- (status_code == 200L)
+  raw_text <- httr::content(result, "text")
+  elapsed_seconds <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+  if (success) {
+    try(ds <- utils::read.csv(text = raw_text, stringsAsFactors = FALSE), 
+        silent = TRUE)
+    if (exists("ds") & inherits(ds, "data.frame")) {
+      outcome_message <- paste0("The data dictionary describing ", 
+                                format(nrow(ds), big.mark = ",", scientific = FALSE, trim = TRUE), 
+                                " fields was read from REDCap in ", 
+                                round(elapsed_seconds, 1), " seconds.  The http status code was ", 
+                                status_code, ".")
+      raw_text <- ""} else {success <- FALSE
+      ds <- data.frame()
+      outcome_message <- paste0("The REDCap metadata export failed.  The http status code was ", 
+                                status_code, ".  The 'raw_text' returned was '", 
+                                raw_text, "'.")}
+  } else {
+    ds <- data.frame()
+    outcome_message <- paste0("The REDCapR metadata export operation was not successful.  The error message was:\n", 
+                              raw_text)}
+  if (message){ 
+    message(outcome_message)}
+  return(list(data = ds, success = success, status_code = status_code, 
+              outcome_message = outcome_message, elapsed_seconds = elapsed_seconds, 
               raw_text = raw_text))
 }
