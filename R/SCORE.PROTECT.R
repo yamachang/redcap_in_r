@@ -2,7 +2,7 @@
 bsrc.score<-function(df=NULL,formname=NULL,...){
   library(dplyr)
   possible_forms<-c("athf","ham","cirsg","exit","drs","wtar","mmse",
-                    "bis","isel","iip","neo","paibor","spsi","ssd","uppsp")
+                    "bis","ctq","isel","iip","neo","paibor","spsi","ssd","uppsp")
   if(is.null(formname)){
     message("No form name supplied, choose one of these options:")
     print(possible_forms)
@@ -175,6 +175,31 @@ bsrc.score<-function(df=NULL,formname=NULL,...){
                              round(rowSums(df[paste0("bis36_",c('1r','5r','6r','10r','11r',12,'8r', '13r', 16, 28, '35r'))],na.rm=T)*11/10), NA))
   )
     return(df)
+  }
+  
+  #CTQ scoring
+  score.ctq<-function(df=NULL){
+  df<-df %>% mutate_at(vars(paste0("ctq_",1:28)),as.numeric)
+  #Reverse scoring
+  df <- df %>% mutate(
+    ctq_2r=6-ctq_2, ctq_5r=6-ctq_5, ctq_7r=6-ctq_7, ctq_13r=6-ctq_13, ctq_19r=6-ctq_19, 
+    ctq_26r=6-ctq_26, ctq_28r=6-ctq_28)
+  #Subscale scoring
+  df <- df %>% mutate(
+    ctq_emotional_abuse = ifelse(rowSums(is.na(CTQ[paste0("ctq_", c(3, 8, 14, 18, 25))]))==0, 
+                      rowSums(CTQ[paste0("ctq_", c(3, 8, 14, 18, 25))]),NA),
+    ctq_physical_abuse = ifelse(rowSums(is.na(CTQ[paste0("ctq_", c(9, 11, 12, 15, 17))]))==0, 
+                      rowSums(CTQ[paste0("ctq_", c(9, 11, 12, 15, 17))]),NA),
+    ctq_sexual_abuse = ifelse(rowSums(is.na(CTQ[paste0("ctq_", c(20, 21, 23, 24, 27))]))==0, 
+                      rowSums(CTQ[paste0("ctq_", c(20, 21, 23, 24, 27))]),NA),
+    ctq_emotiona_neglect = ifelse(rowSums(is.na(CTQ[paste0("ctq_", c('5r', '7r', '13r', '19r', '28r'))]))==0, 
+                      rowSums(CTQ[paste0("ctq_", c('5r', '7r', '13r', '19r', '28r'))]),NA),
+    ctq_physical_neglect = ifelse(rowSums(is.na(CTQ[paste0("ctq_", c(1, '2r', 4, 6, '26r'))]))==0, 
+                      rowSums(CTQ[paste0("ctq_", c(1, '2r', 4, 6, '26r'))]),NA),
+    ctq_minimization = ifelse(rowSums(is.na(CTQ[paste0("ctq_", c(10, 16, 22))]))==0, 
+                       rowSums(CTQ[paste0("ctq_", c(10, 16, 22))]),NA)
+  )
+  return(df)
   }
   
   #ISEL scoring
