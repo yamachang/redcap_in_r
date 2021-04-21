@@ -114,6 +114,15 @@ clean_str <- function(dfx,remove=T,replace_text="") {
 }
 
 ##########################
+bsrc.getEVTDATEFIELD<-function(protocol,db=NULL) {
+  if(is.null(db)){db<-bsrc.checkdatabase2(protocol = ptcs$protect,output = T)}
+  datefield_vers<-db$metadata[which(db$metadata$field_note=="EVT_DATEFIELD"),]
+  gMAPx<-db$eventmap[which(db$eventmap$form %in% datefield_vers$form_name),]
+  gMAPx$date_variname<-datefield_vers$field_name[match(gMAPx$form, datefield_vers$form_name)]
+  return(gMAPx)
+}
+
+##########################
 tolong_multivalue<-function(dfx=NULL,varying=NULL,notvarying=NULL,id.var=c("registration_redcapid","redcap_event_name"),var.left="type",var.right="attempt",sep="_at",timepos="right") {
   dfx_var_melt<-reshape2::melt(data = dfx,id.vars=notvarying)
   dfx_var_melt[[var.left]]<-sapply(strsplit(as.character(dfx_var_melt$variable),split = sep,fixed = T),"[[",1)
