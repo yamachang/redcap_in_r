@@ -1,8 +1,4 @@
-#---
-#Title: "REDREW"
-#Author: "Jiazhou Chen"
-#Version: 2.2
-#---
+
 #[Task List]
 #0/1 Missingness check arm specific
 #Version 2.2 Changelog:
@@ -796,22 +792,7 @@ dnpl.mappingtransfer<-function(map,spiltsign="."){
     map[as.numeric(rownum.x)]->newmap
   }
 }
-########################## Match MericWire Identifier to df
-bsrc.getmwidentifier<-function(db,only=F,funbsrc=NULL,protocol = protocol.cur, ...) {
-  if (is.null(curdb)){
-    curdb<-bsrc.checkdatabase2(protocol = protocol,... = ...)
-    funbsrc<-curdb$data
-  } else {curdb->funbsrc}
-  if(missing(db)) stop("No DB")
-  mwidonly<-data.frame(funbsrc$registration_redcapid,funbsrc$ema_studyidentifier)
-  names(mwidonly)<-c('redcapid','mwidentifier')
-  mwidonly$mwidentifier<-as.character(mwidonly$mwidentifier)
-  mwidonly$mwidentifier[which(mwidonly$mwidentifier=="")]<-NA
-  mwidonly<-na.omit(mwidonly)
-  db$mwidentifier<-mwidonly$mwidentifier[match(db$registration_redcapid,mwidonly$redcapid)]
-  if (only) {db<-db[which(!is.na(db$mwidentifier)),]}
-  return(db)
-}
+
 ########################## Update value from one database to another:
 bsrc.updatedb<-function(ndf,df,by="registration_redcapid") {
   if (missing(df)) {df<-funbsrc}
@@ -844,107 +825,7 @@ bsrc.getIDEVTDate<-function(dbx=NULL,rcIDvar="registration_redcapid",evt_filter=
   names(IDEVT_wa)<-c(rcIDvar,"redcap_event_name","variname","date")
   return(IDEVT_wa)
 }
-# dnpl.dffunctioncall<-function(lfunc.object=list(
-#                                               list(call=NULL, #either this function(x){} or this "function"
-#                                                    argument=list(x=NULL,
-#                                                                  y=NULL)
-#                                                    )
-#                                               ), envir=parent.env()) {
-#
-#   lapply(lfunc.object, function(x) {message(x)
-#   if (class(x$call)=="function") {
-#     mode=FALSE
-#   } else if (class(x$functionname)=="character") {
-#     mode=TRUE
-#   }
-#   do.call(x$call,args = x$argument,quote = FALSE,envir = envir)
-#   lfunc.object=list(list(call=max,argument=list(numtest),functionname="max"))
-#   })
-# }
-#
-#
-#
 
-
-
-###############################
-####### IN DEVELOPMENT ########
-###############################
-if (FALSE){
-
-  bsrc.process.race<-function(odk,Race) {
-    for (i in 1:length(odk$ID)) {
-      if  (is.na(odk$Race[i])) {
-        odk$registration_race___1[i]<-NA
-        odk$registration_race___2[i]<-NA
-        odk$registration_race___3[i]<-NA
-        odk$registration_race___4[i]<-NA
-        odk$registration_race___5[i]<-NA
-        odk$registration_race___999[i]<-NA
-      }
-      else {
-        if  (odk$Race[i]==1) {
-          odk$registration_race___1[i]<-1
-          odk$registration_race___2[i]<-0
-          odk$registration_race___3[i]<-0
-          odk$registration_race___4[i]<-0
-          odk$registration_race___5[i]<-0
-          odk$registration_race___999[i]<-0
-        }
-
-        if  (odk$Race[i]==2) {
-          odk$registration_race___1[i]<-0
-          odk$registration_race___2[i]<-1
-          odk$registration_race___3[i]<-0
-          odk$registration_race___4[i]<-0
-          odk$registration_race___5[i]<-0
-          odk$registration_race___999[i]<-0
-        }
-
-        if  (odk$Race[i]==3) {
-          odk$registration_race___1[i]<-0
-          odk$registration_race___2[i]<-0
-          odk$registration_race___3[i]<-1
-          odk$registration_race___4[i]<-0
-          odk$registration_race___5[i]<-0
-          odk$registration_race___999[i]<-0
-        }
-        if  (odk$Race[i]==4) {
-          odk$registration_race___1[i]<-0
-          odk$registration_race___2[i]<-0
-          odk$registration_race___3[i]<-0
-          odk$registration_race___4[i]<-1
-          odk$registration_race___5[i]<-0
-          odk$registration_race___999[i]<-0
-        }
-        if  (odk$Race[i]==5) {
-          odk$registration_race___1[i]<-0
-          odk$registration_race___2[i]<-0
-          odk$registration_race___3[i]<-0
-          odk$registration_race___4[i]<-0
-          odk$registration_race___5[i]<-1
-          odk$registration_race___999[i]<-0
-        }
-        if  (odk$Race[i]==6) {
-          odk$registration_race___1[i]<-1
-          odk$registration_race___2[i]<-1
-          odk$registration_race___3[i]<-1
-          odk$registration_race___4[i]<-1
-          odk$registration_race___5[i]<-1
-          odk$registration_race___999[i]<-0
-        }
-        if  (odk$Race[i]==7) {
-          odk$registration_race___1[i]<-0
-          odk$registration_race___2[i]<-0
-          odk$registration_race___3[i]<-0
-          odk$registration_race___4[i]<-0
-          odk$registration_race___5[i]<-0
-          odk$registration_race___999[i]<-1
-        }
-      }
-    }
-  }
-}
 ######MasterDEMO related:
 
 bsrc.masterdemo.checkduplicate<-function(protocol=ptcs$masterdemo,infovars="registration_redcapid",
@@ -984,48 +865,4 @@ bsrc.change_grp_ptcs<-function(input=NULL,origin=c("bsocial","protect","masterde
           input[[vari_map[[destination]]]][noorder]<-NA
           return(input)},
   )
-}
-
-
-
-
-###############################
-####### SHINY######### ########
-###############################
-#Following is for Shiny Web App,
-if (FALSE) {
-  #This chunk is for shiny web app
-  library(shiny)
-
-  #Will run the database here and generate informaiton in a dataframe
-  #Get code from chuck 2
-
-  #Define UI here:
-  ui <- fluidPage(
-    titlePanel("B-Social Single Participant "),
-
-    sidebarLayout(
-      numericInput(inputId = "id", label = h3("Please input their 6 digits ID"), value = 1),
-      helpText("Note: help text isn't a true widget,",
-               "but it provides an easy way to add text to",
-               "accompany other widgets."),
-      actionButton(inputId = "changeid", "Submit")),
-
-    mainPanel(tableOutput("view"))
-  )
-
-  # Define server logic here:
-  server <- function(input, output) {
-
-    randomVals <- eventReactive(input$changeid, {
-      runif(input$id)
-    })
-
-    output$plot <- renderPlot({
-      hist(randomVals())
-    })
-  }
-
-  # Run the app ----
-  shinyApp(ui = ui, server = server)
 }
