@@ -18,7 +18,7 @@ p3.weekly.report<-function(enddate= Sys.Date(), grabnew=T){
 #                     reg_term_yesno_protect2==0))->x
 #     x %>% select(registration_redcapid,registration_initials,
 #                  registration_ptcstat___protect3,
-#                  registration_ptcstat___protect2,reg_term_yesno_protect2)->x 
+#                  registration_ptcstat___protect2,reg_term_yesno_protect2)->x
 
 #Get variables from the master demo
     MD<-md$data %>% select(masterdemoid=registration_redcapid, registration_wpicid,registration_initials, 
@@ -393,3 +393,4 @@ p3.weekly.report<-function(enddate= Sys.Date(), grabnew=T){
 write.csv(thismonth.fu,"weekly.protect3thismo.csv")
 write.csv(nextmonth.fu,"weekly.protect3nextmo.csv")
 }
+
