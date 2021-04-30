@@ -140,6 +140,24 @@ bsrc.score<-function(df=NULL,formname=NULL,...){
   }
 
 #Self reports
+  #ARS scoring
+  score.ars<-function(df=NULL){
+    df<-df %>% mutate_at(vars(paste0("ars_",1:19)),as.numeric)
+    df<-df %>% mutate(
+    ars_angry_afterthoughts=ifelse(rowSums(is.na(df[paste0("ars_",c(19,18,9,8))]))==0,
+                         rowSums(df[paste0("ars_",c(19,18,9,8))]),NA),
+    ars_thoughts_revenge=ifelse(rowSums(is.na(df[paste0("ars_",c(4,16,13,6))]))==0,
+                         rowSums(df[paste0("ars_",c(4,16,13,6))]),NA),
+    ars_angry_memories=ifelse(rowSums(is.na(df[paste0("ars_",c(2,3,15,1,5))]))==0,
+                         rowSums(df[paste0("ars_",c(2,3,15,1,5))]),NA),
+    ars_understanding_causes=ifelse(rowSums(is.na(df[paste0("ars_",c(12,17,11,10))]))==0,
+                         rowSums(df[paste0("ars_",c(12,17,11,10))]),NA),
+    ars_total=ifelse(rowSums(is.na(df[paste0("ars_",c(1:19))]))==0,
+                         rowSums(df[paste0("ars_",c(1:19))]),ifelse(
+                          rowSums(is.na(df[paste0("ars_",c(1:19))]))==1),
+                     round(rowSums(df[paste0("ars_",c(1:19))],na.rm=T)*19/18),NA)
+  }
+  
   #BIS-36 Scoring
   score.bis<-function(df=NULL){
     df<-df %>% mutate_at(vars(paste0("bis36_",1:36)),as.numeric)
@@ -383,6 +401,15 @@ bsrc.score<-function(df=NULL,formname=NULL,...){
          ifelse(!is.na(df[i, "ssd_10a"])& df[i, "ssd_10a"]>3,1,0)
       }
     return(df)
+  }
+  
+  #TA scoring
+  score.ta<-function(df=NULL){
+    df<-df %>% mutate_at(vars(paste0("ta_",1:7)),as.numeric)
+    df<-df %>% mutate(
+      ta_total=ifelse(rowSums(is.na(df[paste0("ta_",1:7)]))==0,
+                      rowSums(df[paste0("ta_",1:7)]),NA)
+    )
   }
   
   #UPPSP scoring
