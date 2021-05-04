@@ -8,7 +8,7 @@ bsrc.ProtectDeathPull<-function(df = NULL, file_path = NULL,
   
   #Setup
   masterdemo_environment<-bsrc.checkdatabase2(ptcs$masterdemo,online = T)
-    idmap<-md$data[c("registration_redcapid","registration_wpicid","registration_soloffid")]
+    idmap<-masterdemo_environment$data[c("registration_redcapid","registration_wpicid","registration_soloffid")]
     names(idmap)<-c("masterdemoid","wpicid","soloffid")
   Protect<-bsrc.checkdatabase2(ptcs$protect,online = T) 
   
