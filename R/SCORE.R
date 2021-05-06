@@ -241,10 +241,10 @@ bsrc.score<-function(df=NULL,formname=NULL,...){
     ars_total=ifelse(rowSums(is.na(df[paste0("ars_",c(1:19))]))==0,
                          rowSums(df[paste0("ars_",c(1:19))]),ifelse(
                           rowSums(is.na(df[paste0("ars_",c(1:19))]))==1,
-                     round(rowSums([df[paste0("ars_",c(1:19))],na.rm=T)*19/18), NA))
+                     round(rowSums(df[paste0("ars_",c(1:19))],na.rm=T)*19/18), NA))
     )
   }
-  
+
   #BIS-36 Scoring
   score.bis<-function(df=NULL){
     df<-df %>% mutate_at(vars(paste0("bis36_",1:36)),as.numeric)
