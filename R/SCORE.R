@@ -1,7 +1,7 @@
 #Protect Scoring
 bsrc.score<-function(df=NULL,formname=NULL,...){
   library(dplyr)
-  possible_forms<-c("athf","ham","cirsg","exit","drs","wtar","mmse",
+  possible_forms<-c("athf","ham","cirsg","sidp","exit","drs","wtar","mmse",
                     "bis","ctq","isel","iip","neo","paibor","spsi","ssd","uppsp")
   if(is.null(formname)){
     message("No form name supplied, choose one of these options:")
@@ -96,7 +96,40 @@ bsrc.score<-function(df=NULL,formname=NULL,...){
     )
     return(df)
   }
-
+  
+  #SCID "scoring"
+    score.scid<-function(df=NULL){
+    #Must not have ALL missingness because we will change values to 1 
+        if(!any(is.na(df %>% select(contains(paste0("scid_",c(17:37))))))){
+          stop("You MUST first remove rows with all missing values for the scid scoring to work")
+        }
+        #Change NA values to 1 in key variables
+        df <- df %>%
+         mutate_at(vars(c(paste("scid_",17:23, "_s", seq(115, 127, 2), sep=""),
+                        paste("scid_",24:37,"_s", c(129,139,141,147,151,157,161,165,
+                                      171,173,177,183,189,191),sep=""))), ~ifelse(is.na(.), 1, .))
+        #Score number of disorders
+        df <- df  %>% mutate(
+          LP_numsubs=rowSums(df[grepl(paste0("_s", c(138,seq(114,128,by=2)), collapse="|"),names(df))]>1),
+          PM_numsubs=rowSums(df[grepl(paste0("_s", c(seq(115,127,by=2),129,129), collapse="|"),names(df))]>1),
+          LP_numanx=rowSums(df[grepl(paste0("_s", c(140,146,150,156,160,164,170,172,176,182,188,190), collapse="|"),
+                                         names(df))]>1),
+          PM_numanx=rowSums(df[grepl(paste0("_s", c(141,147,151,157,161,165,171,173,177,183,189,191), collapse="|"),
+                                         names(df))]>1)
+        )
+        #Score presence/absense of disorders
+        df <- df %>% mutate(
+          LP_pressubs=ifelse(LP_numsubs>0,1,0),
+          PM_pressubs=ifelse(PM_numsubs>0,1,0),
+          LP_presanx=ifelse(LP_numanx>0,1,0),
+          PM_presanx=ifelse(PM_numanx>0,1,0)
+        )
+        return(df)
+        message("This function gives number and presence of lifetime and current anxiety and substance use disorders:
+                LP= lifetime prevalence, PM= past month,
+                pres= presence (vs. absence), num= number of,
+                anx= anxiety disorders, subs= substance use disorders")
+        }
   #SIDP scoring
     score.sidp<-function(df=NULL){
       #Remove unnecessary variables, change to numeric, all 4s should be NA (unscorable)
