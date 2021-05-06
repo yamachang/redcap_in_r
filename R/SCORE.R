@@ -97,6 +97,59 @@ bsrc.score<-function(df=NULL,formname=NULL,...){
     return(df)
   }
 
+  #SIDP scoring
+    score.sidp<-function(df=NULL){
+      #Remove unnecessary variables, change to numeric, all 4s should be NA (unscorable)
+      if(!"masterdemoid" %in% names(df)){
+        stop("need to IDmap first for SIDP")
+      }
+      df<-df %>% select(masterdemoid, redcap_event_name,contains("score")) %>% 
+        mutate_at(vars(contains("score")),as.numeric)
+      df[!is.na(df) & df=="4"]<-NA
+      
+      #[number of non-NA criteria met/# of possible criteria-missingness]*possible criteria
+      df<-df %>% mutate(
+        sidp_antisocial_sxs=ifelse(rowSums(is.na(df[paste0("sidp_iv_",c("j3","j5","j6","j2","j7","j4","j8","j9"),"score")]))<8,
+        round(
+          (rowSums(df[paste0("sidp_iv_",c("j3","j5","j6","j2","j7","j4","j8","j9"),"score")]>1,na.rm = T)/(8-
+          rowSums(is.na(df[paste0("sidp_iv_",c("j3","j5","j6","j2","j7","j4","j8","j9"),"score")]))))*8
+          ),NA),
+        sidp_avoidant_sxs=ifelse(rowSums(is.na(df[paste0("sidp_iv_",c("b2","d3","c3","d5","d6","d1a","a3"),"score")]))<7,
+        round(
+          (rowSums(df[paste0("sidp_iv_",c("b2","d3","c3","d5","d6","d1a","a3"),"score")]>1,na.rm = T)/(7-
+          rowSums(is.na(df[paste0("sidp_iv_",c("b2","d3","c3","d5","d6","d1a","a3"),"score")]))))*7
+          ),NA),
+        sidp_obsessivecompulsive_sxs=ifelse(rowSums(is.na(df[paste0("sidp_iv_",c("b6","b4","b1","g5","g7","b5","a7","g6"),"score")]))<8,
+        round(
+          (rowSums(df[paste0("sidp_iv_",c("b6","b4","b1","g5","g7","b5","a7","g6"),"score")]>1,na.rm = T)/(8-
+          rowSums(is.na(df[paste0("sidp_iv_",c("b6","b4","b1","g5","g7","b5","a7","g6"),"score")]))))*8
+          ),NA),
+        sidp_borderline_sxs=ifelse(rowSums(is.na(df[paste0("sidp_iv_",c("c7","c5","g1","j1","i5","e4","e5","i1","i4"),"score")]))<9,
+        round(
+          (rowSums(df[paste0("sidp_iv_",c("b6","b4","b1","g5","g7","b5","a7","g6"),"score")]>1,na.rm = T)/(9-
+          rowSums(is.na(df[paste0("sidp_iv_",c("b6","b4","b1","g5","g7","b5","a7","g6"),"score")]))))*9
+          ),NA),
+        sidp_narcissism_sxs=ifelse(rowSums(is.na(df[paste0("sidp_iv_",c("g3","g4","d1n","d11","g2","b3","d4","g8","i2"),"score")]))<9,
+        round(
+          (rowSums(df[paste0("sidp_iv_",c("b6","b4","b1","g5","g7","b5","a7","g6"),"score")]>1,na.rm = T)/(9-
+          rowSums(is.na(df[paste0("sidp_iv_",c("b6","b4","b1","g5","g7","b5","a7","g6"),"score")]))))*9
+          ),NA),
+        sidp_schizotypal_sxs=ifelse(rowSums(is.na(df[paste0("sidp_iv_",c("h5","h7","h_8","f2","h9","f4","f1","c2","d2"),"score")]))<9,
+        round(
+          (rowSums(df[paste0("sidp_iv_",c("b6","b4","b1","g5","g7","b5","a7","g6"),"score")]>1,na.rm = T)/(9-
+          rowSums(is.na(df[paste0("sidp_iv_",c("b6","b4","b1","g5","g7","b5","a7","g6"),"score")]))))*9
+          ),NA)
+        )
+      df<-df %>% mutate(
+        sidp_antisocial_presence=ifelse(sidp_antisocial_sxs>2 & sidp_iv_j9score>=2,1,0),
+        sidp_avoidant_presence=ifelse(sidp_avoidant_sxs>3,1,0),
+        sidp_obsessivecompulsive_presence=ifelse(sidp_obsessivecompulsive_sxs>3,1,0),
+        sidp_borderline_presence=ifelse(sidp_borderline_sxs>4,1,0),
+        sidp_narcissism_presence=ifelse(sidp_narcissism_sxs>4,1,0),
+        sidp_schizotypal_presence=ifelse(sidp_schizotypal_sxs>4,1,0)
+      )
+      return(df)
+    }
 #Neuropsych
   #EXIT scoring
   score.exit<-function(df=NULL){
