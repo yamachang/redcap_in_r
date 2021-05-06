@@ -1,12 +1,16 @@
 bsrc.ProtectDeathPull<-function(df = NULL, file_path = NULL, 
-                                options = c("death info", "last visit"), 
-                                masterdemo_environment = md, 
-                                Protect=pt){
+                                options = c("death info", "last visit")){
   require(dplyr);require(readxl);require(tibble)
   
   # get the list of participants if df is not specified 
   if (is.null(df)){df <- readxl::read_xlsx(file_path,sheet = 1) }else{
     message("The file_path is not used.")}
+  
+  #Setup
+  masterdemo_environment<-bsrc.checkdatabase2(ptcs$masterdemo,online = T)
+    idmap<-masterdemo_environment$data[c("registration_redcapid","registration_wpicid","registration_soloffid")]
+    names(idmap)<-c("masterdemoid","wpicid","soloffid")
+  Protect<-bsrc.checkdatabase2(ptcs$protect,online = T) 
   
   # get all Protect pts
   MD_PT<-masterdemo_environment$data %>% mutate_all(~replace(.,.=="",NA)) %>% as_tibble() %>%
