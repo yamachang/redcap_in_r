@@ -19,6 +19,27 @@ bsrc.score<-function(df=NULL,formname=NULL,...){
   return(do.call(score_func,argu))
 }
 #Clinical
+  #SSI scoring
+  score.ssi<-function(df=NULL){
+    df <- df %>% 
+        mutate_at(vars(paste0("ssi_",c(6:19),"_worst"),paste("ssi_",6:19, "_curr", sep="")),~replace(.,.=="na"|.=="",0)) %>%
+        mutate_at(vars(paste0("ssi_",c(6:19),"_worst"),paste("ssi_",6:19, "_curr", sep="")),~replace(.,.=="dk"|.=="refuse",NA)) %>%
+        mutate_at(vars(paste0("ssi_",c(1:5),"_worst"),paste("ssi_",1:5, "_curr", sep="")),~replace(.,.=="na"|.=="dk"|.=="refuse",NA)) %>% 
+        mutate_at(vars(paste0("ssi_",c(1:19),"_worst"),paste("ssi_",1:19, "_curr", sep="")), ~as.integer(.))
+      
+     df <- df %>% 
+        mutate(
+          SSI_worst_s = ifelse(rowSums(is.na(SSI[paste0("ssi_",c(1:19),"_worst")]))==0,
+                             rowSums(SSI[paste0("ssi_",c(1:19),"_worst")]), 
+                             ifelse(rowSums(is.na(SSI[paste0("ssi_",c(1:19),"_worst")])) == 1, 
+                                    round(rowSums(SSI[paste0("ssi_",c(1:19),"_worst")], na.rm = T)*19/18, digits = 0), NA)),
+          SSI_current_s = ifelse(rowSums(is.na(SSI[paste0("ssi_",c(1:19),"_curr")]))==0,
+                             rowSums(SSI[paste0("ssi_",c(1:19),"_curr")]), 
+                             ifelse(rowSums(is.na(SSI[paste0("ssi_",c(1:19),"_curr")])) == 1, 
+                                    round(rowSums(SSI[paste0("ssi_",c(1:19),"_curr")], na.rm = T)*19/18, digits = 0), NA))
+          )
+    return(df)
+    }
   #SIS scoring
     score.sis<-function(df=NULL){
     #Need to be numeric to score, change to numeric
