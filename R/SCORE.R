@@ -33,14 +33,14 @@ bsrc.score<-function(df=NULL,formname=NULL,...){
       #Score
       df <- df %>% 
         mutate(
-          SSI_worst_s = ifelse(rowSums(is.na(SSI[paste0("ssi_",c(1:19),"_worst")]))==0,
-                               rowSums(SSI[paste0("ssi_",c(1:19),"_worst")]), 
-                               ifelse(rowSums(is.na(SSI[paste0("ssi_",c(1:19),"_worst")])) == 1, 
-                                      round(rowSums(SSI[paste0("ssi_",c(1:19),"_worst")], na.rm = T)*19/18, digits = 0), NA)),
-          SSI_current_s = ifelse(rowSums(is.na(SSI[paste0("ssi_",c(1:19),"_curr")]))==0,
-                                 rowSums(SSI[paste0("ssi_",c(1:19),"_curr")]), 
-                                 ifelse(rowSums(is.na(SSI[paste0("ssi_",c(1:19),"_curr")])) == 1, 
-                                        round(rowSums(SSI[paste0("ssi_",c(1:19),"_curr")], na.rm = T)*19/18, digits = 0), NA))
+          SSI_worst_s = ifelse(rowSums(is.na(df[paste0("ssi_",c(1:19),"_worst")]))==0,
+                               rowSums(df[paste0("ssi_",c(1:19),"_worst")]), 
+                               ifelse(rowSums(is.na(df[paste0("ssi_",c(1:19),"_worst")])) == 1, 
+                                      round(rowSums(df[paste0("ssi_",c(1:19),"_worst")], na.rm = T)*19/18, digits = 0), NA)),
+          SSI_current_s = ifelse(rowSums(is.na(df[paste0("ssi_",c(1:19),"_curr")]))==0,
+                                 rowSums(df[paste0("ssi_",c(1:19),"_curr")]), 
+                                 ifelse(rowSums(is.na(df[paste0("ssi_",c(1:19),"_curr")])) == 1, 
+                                        round(rowSums(df[paste0("ssi_",c(1:19),"_curr")], na.rm = T)*19/18, digits = 0), NA))
         )
     return(df)
     }
