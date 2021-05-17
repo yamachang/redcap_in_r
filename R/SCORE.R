@@ -22,8 +22,8 @@ bsrc.score<-function(df=NULL,formname=NULL,...){
   #SSI scoring
   score.ssi<-function(df=NULL){
     #Remove those that are ONLY missing
-      df<-df[which(rowSums(is.na(df[paste0("ssi_",c(6:19),"_worst"),paste("ssi_",6:19, "_curr", sep="")]) | 
-          df[paste0("ssi_",c(6:19),"_worst"),paste("ssi_",6:19, "_curr", sep="")]=="")<38),]
+      df<-df[which(rowSums(is.na(df[c(paste0("ssi_",c(1:19),"_worst"),paste("ssi_",1:19, "_curr", sep=""))]) | 
+                             df[c(paste0("ssi_",c(1:19),"_worst"),paste("ssi_",1:19, "_curr", sep=""))]=="")<38),]
       #Change values to NAs/0s
       df <- df %>% 
         mutate_at(vars(paste0("ssi_",c(6:19),"_worst"),paste("ssi_",6:19, "_curr", sep="")),~replace(.,.=="na"|.=="",0)) %>%
