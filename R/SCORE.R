@@ -230,8 +230,8 @@ bsrc.score<-function(df=NULL,formname=NULL,...){
                                               'ac','ad','ae','af','ag','ah','ai','aj','ak'))
     df<-df %>% mutate_at(vars(drs_vars),as.numeric)
     df<-df %>% mutate(
-    drs_attention=ifelse(rowSums(is.na(df[paste0("drs_",c('a','b','c','d'))]))==0,
-                         rowSums(df[paste0("drs_",c('a','b','c','d'))]),NA),
+    drs_attention=ifelse(rowSums(is.na(df[paste0("drs_",c('a','b','c','d','ad','ae','ah','aj'))]))==0,
+                         rowSums(df[paste0("drs_",c('a','b','c','d','ad','ae','ah','aj'))]),NA),
     drs_initandpers=ifelse(rowSums(is.na(df[paste0("drs_",c('e','f','g','h','i','j','k','l','m','n','o'))]))==0,
                          rowSums(df[paste0("drs_",c('e','f','g','h','i','j','k','l','m','n','o'))]),ifelse(
                           rowSums(is.na(df[paste0("drs_",c('e','f','g','h','i','j','k','l','m','n','o'))]))==1,
@@ -240,8 +240,8 @@ bsrc.score<-function(df=NULL,formname=NULL,...){
                          rowSums(df[paste0("drs_",c('p','q','r','s','t','u'))]),NA),
     drs_conceptualization=ifelse(rowSums(is.na(df[paste0("drs_",c('v','w','x','y','z','ab'))]))==0,
                          rowSums(df[paste0("drs_",c('v','w','x','y','z','ab'))]),NA),
-    drs_memory=ifelse(rowSums(is.na(df[paste0("drs_",c('ac','ad','ae','af','ag','ah','ai','aj','ak'))]))==0,
-                         rowSums(df[paste0("drs_",c('ac','ad','ae','af','ag','ah','ai','aj','ak'))]),NA),
+    drs_memory=ifelse(rowSums(is.na(df[paste0("drs_",c('ac','af','ag','ai','ak'))]))==0,
+                         rowSums(df[paste0("drs_",c('ac','af','ag','ai','ak'))]),NA),
     drs_total=ifelse(rowSums(is.na(df))==0, rowSums(df[drs_vars]),ifelse(
       rowSums(is.na(df))==1, round(rowSums(df[drs_vars],na.rm=T)*36/35),ifelse(
         rowSums(is.na(df))==2,round(rowSums(df[drs_vars],na.rm=T)*36/34),ifelse(
