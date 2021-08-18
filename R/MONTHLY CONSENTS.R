@@ -36,6 +36,7 @@ p3.monthly.consent<-function(enddate= Sys.Date(), grabnew=T){
   P3_last_month <- P3 %>% 
     filter(con_month == last_month & con_year==cur_year) # filter current month's pts
   
+  message("Today's date: ", Sys.Date())
   message("This month consents: ", paste0(P3_this_month$registration_initials, collapse = ", "))
   message("Last month consents: ", paste0(P3_last_month$registration_initials, collapse = ", "))
 }
