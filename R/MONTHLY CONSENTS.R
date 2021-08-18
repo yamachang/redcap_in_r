@@ -39,5 +39,3 @@ p3.monthly.consent<-function(enddate= Sys.Date(), grabnew=T){
   message("This month consents: ", paste0(P3_this_month$registration_initials, collapse = ", "))
   message("Last month consents: ", paste0(P3_last_month$registration_initials, collapse = ", "))
 }
-
-p3.monthly.consent()
