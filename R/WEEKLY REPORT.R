@@ -29,6 +29,22 @@ p3.weekly.report<-function(enddate= Sys.Date(), grabnew=T){
                     registration_futurenp, registration_ptcstat___protect2, registration_ptcstat___protect3,
                     reg_term_yesno_protect3, reg_term_yesno_protect2, registration_gender,
                     reg_p3catchup)
+  
+#Add monthly consent
+  P3 <- MD %>% 
+    filter(registration_ptcstat___protect3==1) %>% # filter pts in p3
+    mutate(con_month = month(ymd(reg_condate_protect3)), 
+           con_year = year(ymd(reg_condate_protect3))) %>%  # extract consent month and year
+    mutate(cur_month = month(ymd(Sys.Date())),
+           last_month = cur_month - 1,
+           cur_year = year(ymd(Sys.Date()))) 
+  
+  P3_this_month <- P3 %>% 
+    filter(con_month == cur_month & con_year==cur_year) # filter current month's pts
+  
+  P3_last_month <- P3 %>% 
+    filter(con_month == last_month & con_year==cur_year) # filter current month's pts
+  
 #Remove unnecessary people
   #Only consented for Protect2 or Protect 3
   MD[which(rowSums(MD %>% select(registration_ptcstat___protect2,
@@ -387,7 +403,14 @@ p3.weekly.report<-function(enddate= Sys.Date(), grabnew=T){
     print("Error, duplicated people (Next month)")
     nextmonth.fu[-which(duplicated(nextmonth.fu)),]->nextmonth.fu}
 
-  
+# Print monthly consent
+  message("Monthly consents below (update: ", Sys.Date(), "): ")
+  cat("This month consents: ")
+  cat(paste0(P3_this_month$registration_initials, collapse = ", "))
+  cat("\n")
+  cat("Last month consents: ")
+  cat(paste0(P3_last_month$registration_initials, collapse = ", "))
+  cat("\n")  
  
 #Put into "week.protect2.report" spreadsheet in working directory
 write.csv(thismonth.fu,"weekly.protect3thismo.csv")
