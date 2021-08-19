@@ -362,9 +362,9 @@ p3.weekly.report<-function(enddate= Sys.Date(), grabnew=T){
   #Assessor numbers to replace
   as.character(fus$assessor)->fus$assessor
   assess_map<-data.frame(nums=c("99054","50987","50604","50330","50218","50824","50515",
-                         "44444","88888","22222", "55555", "60910"), 
+                         "44444","88888","22222", "55555", "60910", "56789", "12345", "14545", "77777"), 
           ppl=c("LAURA","MANDY","MARIA","MICHELLE","JIAZHOU","NATE","MORGAN",
-                             "EMILY","CORTNEE","LIZZIE","EMMA","KAYLEE"))
+                             "EMILY","CORTNEE","LIZZIE","EMMA","KAYLEE", "AKIRA", "CHRISTIANNA","KATHRINE", "THANDI"))
   assess_map %>% mutate_all(~as.character(.))->assess_map
   for (i in 1:nrow(assess_map)){
     fus[which(fus$assessor %in% assess_map$nums[i]),"assessor"]<-assess_map$ppl[i]
