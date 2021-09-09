@@ -115,9 +115,9 @@ bsrc.score<-function(df=NULL,formname=NULL,...){
                         rowSums(is.na(df[paste("cirsg_",c(1:13),"_s",sep="")]))==1,
                       round(rowSums(df[paste("cirsg_",c(1:13),"_s",sep="")],na.rm=T)*13/12),NA)),
     cirs_3or4=ifelse(rowSums(is.na(df[paste("cirsg_",c(1:13),"_s",sep="")]))==0,
-                      rowSums(cirs[paste("cirsg_",c(1:13),"_s",sep="")]>2),ifelse(
+                      rowSums(df[paste("cirsg_",c(1:13),"_s",sep="")]>2),ifelse(
                         rowSums(is.na(df[paste("cirsg_",c(1:13),"_s",sep="")]))==1,
-                      round(rowSums(cirs[paste("cirsg_",c(1:13),"_s",sep="")]>2,na.rm=T)*13/12),NA))
+                      round(rowSums(df[paste("cirsg_",c(1:13),"_s",sep="")]>2,na.rm=T)*13/12),NA))
     )
     return(df)
   }
