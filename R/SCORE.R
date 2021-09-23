@@ -468,8 +468,8 @@ bsrc.score<-function(df=NULL,formname=NULL,...){
     df<-df %>% mutate(
     spsi_total=ifelse(rowSums(is.na(df[paste0("spsi_",c(1:25))]))==0,
           rowSums(df[paste0("spsi_",c(4,5,9,13,15,16,19,12,21,23,'1r','3r','7r','8r','11r','2r','14r','20r','24r','25r','10r','18r','6r','17r','22r'))]),ifelse(
-            rowSums(is.na(df[paste0("spsi_",c(1:25))]))==1,round(rowSums(SPSI[paste0("spsi_",c(4,5,9,13,15,16,19,12,21,23,'1r','3r','7r','8r','11r','2r','14r','20r','24r','25r','10r','18r','6r','17r','22r'))],na.rm=T)*25/24),ifelse(
-                rowSums(is.na(df[paste0("spsi_",c(1:25))]))==2,round(rowSums(SPSI[paste0("spsi_",c(4,5,9,13,15,16,19,12,21,23,'1r','3r','7r','8r','11r','2r','14r','20r','24r','25r','10r','18r','6r','17r','22r'))],na.rm=T)*25/23),NA)))
+            rowSums(is.na(df[paste0("spsi_",c(1:25))]))==1,round(rowSums(df[paste0("spsi_",c(4,5,9,13,15,16,19,12,21,23,'1r','3r','7r','8r','11r','2r','14r','20r','24r','25r','10r','18r','6r','17r','22r'))],na.rm=T)*25/24),ifelse(
+                rowSums(is.na(df[paste0("spsi_",c(1:25))]))==2,round(rowSums(df[paste0("spsi_",c(4,5,9,13,15,16,19,12,21,23,'1r','3r','7r','8r','11r','2r','14r','20r','24r','25r','10r','18r','6r','17r','22r'))],na.rm=T)*25/23),NA)))
   )
     return(df)
   }
