@@ -334,18 +334,24 @@ bsrc.score<-function(df=NULL,formname=NULL,...){
     ctq_26r=6-ctq_26, ctq_28r=6-ctq_28)
   #Subscale scoring
   df <- df %>% mutate(
-    ctq_emotional_abuse = ifelse(rowSums(is.na(CTQ[paste0("ctq_", c(3, 8, 14, 18, 25))]))==0, 
-                      rowSums(CTQ[paste0("ctq_", c(3, 8, 14, 18, 25))]),NA),
-    ctq_physical_abuse = ifelse(rowSums(is.na(CTQ[paste0("ctq_", c(9, 11, 12, 15, 17))]))==0, 
-                      rowSums(CTQ[paste0("ctq_", c(9, 11, 12, 15, 17))]),NA),
-    ctq_sexual_abuse = ifelse(rowSums(is.na(CTQ[paste0("ctq_", c(20, 21, 23, 24, 27))]))==0, 
-                      rowSums(CTQ[paste0("ctq_", c(20, 21, 23, 24, 27))]),NA),
-    ctq_emotiona_neglect = ifelse(rowSums(is.na(CTQ[paste0("ctq_", c('5r', '7r', '13r', '19r', '28r'))]))==0, 
-                      rowSums(CTQ[paste0("ctq_", c('5r', '7r', '13r', '19r', '28r'))]),NA),
-    ctq_physical_neglect = ifelse(rowSums(is.na(CTQ[paste0("ctq_", c(1, '2r', 4, 6, '26r'))]))==0, 
-                      rowSums(CTQ[paste0("ctq_", c(1, '2r', 4, 6, '26r'))]),NA),
-    ctq_minimization = ifelse(rowSums(is.na(CTQ[paste0("ctq_", c(10, 16, 22))]))==0, 
-                       rowSums(CTQ[paste0("ctq_", c(10, 16, 22))]),NA)
+    ctq_emotional_abuse = ifelse(rowSums(is.na(df[paste0("ctq_", c(3, 8, 14, 18, 25))]))==0, 
+                      rowSums(df[paste0("ctq_", c(3, 8, 14, 18, 25))]),NA),
+    ctq_physical_abuse = ifelse(rowSums(is.na(df[paste0("ctq_", c(9, 11, 12, 15, 17))]))==0, 
+                      rowSums(df[paste0("ctq_", c(9, 11, 12, 15, 17))]),NA),
+    ctq_sexual_abuse = ifelse(rowSums(is.na(df[paste0("ctq_", c(20, 21, 23, 24, 27))]))==0, 
+                      rowSums(df[paste0("ctq_", c(20, 21, 23, 24, 27))]),NA),
+    ctq_emotiona_neglect = ifelse(rowSums(is.na(df[paste0("ctq_", c('5r', '7r', '13r', '19r', '28r'))]))==0, 
+                      rowSums(df[paste0("ctq_", c('5r', '7r', '13r', '19r', '28r'))]),NA),
+    ctq_physical_neglect = ifelse(rowSums(is.na(df[paste0("ctq_", c(1, '2r', 4, 6, '26r'))]))==0, 
+                      rowSums(df[paste0("ctq_", c(1, '2r', 4, 6, '26r'))]),NA),
+    ctq_minimization = ifelse(rowSums(is.na(df[paste0("ctq_", c(10, 16, 22))]))==0, 
+                       rowSums(df[paste0("ctq_", c(10, 16, 22))]),NA),
+    ctq_total = ifelse(rowSums(is.na(df[paste0("ctq_", c(3, 8, 14, 18, 25, 9, 11, 12, 15, 17, 20, 21, 23, 24, 27, '5r', '7r', '13r', '19r', '28r', 1, '2r', 4, 6, '26r'))]))==0, 
+                       rowSums(df[paste0("ctq_", c(3, 8, 14, 18, 25, 9, 11, 12, 15, 17, 20, 21, 23, 24, 27, '5r', '7r', '13r', '19r', '28r', 1, '2r', 4, 6, '26r'))]),
+                       ifelse(rowSums(is.na(df[paste0("ctq_", c(3, 8, 14, 18, 25, 9, 11, 12, 15, 17, 20, 21, 23, 24, 27, '5r', '7r', '13r', '19r', '28r', 1, '2r', 4, 6, '26r'))]))==1, 
+                              rowSums(df[paste0("ctq_", c(3, 8, 14, 18, 25, 9, 11, 12, 15, 17, 20, 21, 23, 24, 27, '5r', '7r', '13r', '19r', '28r', 1, '2r', 4, 6, '26r'))])*25/24,
+                              ifelse(rowSums(is.na(df[paste0("ctq_", c(3, 8, 14, 18, 25, 9, 11, 12, 15, 17, 20, 21, 23, 24, 27, '5r', '7r', '13r', '19r', '28r', 1, '2r', 4, 6, '26r'))]))==2,
+                                     rowSums(df[paste0("ctq_", c(3, 8, 14, 18, 25, 9, 11, 12, 15, 17, 20, 21, 23, 24, 27, '5r', '7r', '13r', '19r', '28r', 1, '2r', 4, 6, '26r'))])*25/23, NA)))
   )
   return(df)
   }
