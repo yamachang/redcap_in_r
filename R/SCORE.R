@@ -272,7 +272,7 @@ score.ars<-function(df=NULL){
 }
 
 #BIS-36 Scoring
-score.bis<-function(df=NULL){
+bis<-function(df=NULL){
   df<-df %>% mutate_at(vars(paste0("bis36_",1:36)),as.numeric)
   #Make reverse scores
   df<-df %>% mutate(
@@ -281,29 +281,47 @@ score.bis<-function(df=NULL){
     bis36_11r=5-bis36_11,bis36_13r=5-bis36_13,bis36_19r=5-bis36_19,
     bis36_30r=5-bis36_30,bis36_35r=5-bis36_35
   ) 
-  df<-df %>% mutate(
-    bis_attention=ifelse(rowSums(is.na(df[paste0("bis36_",c(32,'7r',36,'19r',29))]))==0,
-                         rowSums(df[paste0("bis36_",c(32,'7r',36,'19r',29))]),NA),
-    bis_cognitive_instability=ifelse(rowSums(is.na(df[paste0("bis36_",c(4,34,27))]))==0,
-                                     rowSums(df[paste0("bis36_",c(4,34,27))]),NA),
-    bis_motor=ifelse(rowSums(is.na(df[paste0("bis36_",c(2,31,3,15,18,21,25))]))==0,
-                     rowSums(df[paste0("bis36_",c(2,31,3,15,18,21,25))]),NA),
-    bis_perseverance=ifelse(rowSums(is.na(df[paste0("bis36_",c(14, 20, 33, '30r'))]))==0,
-                            rowSums(df[paste0("bis36_",c(14, 20, 33,'30r'))]),NA),
-    bis_selfcontrol=ifelse(rowSums(is.na(df[paste0("bis36_",c('1r','5r','6r','10r','11r',12))]))==0,
-                           rowSums(df[paste0("bis36_",c('1r','5r','6r','10r','11r',12))]),NA),
-    bis_cognitive_complexity=ifelse(rowSums(is.na(df[paste0("bis36_",c('8r', '13r', 16, 28, '35r'))]))==0,
-                                    rowSums(df[paste0("bis36_",c('8r', '13r', 16, 28, '35r'))]),NA),
-    bis_s_attentional=ifelse(rowSums(is.na(df[paste0("bis36_",c(4,34,27,32,'7r',36,'19r',29))]))==0,
-                             rowSums(df[paste0("bis36_",c(4,34,27,32,'7r',36,'19r',29))]),NA),
-    bis_s_motor=ifelse(rowSums(is.na(df[paste0("bis36_",c(2,31,3,15,18,21,25,14, 20, 33, '30r'))]))==0,
-                       rowSums(df[paste0("bis36_",c(2,31,3,15,18,21,25,14, 20, 33, '30r'))]),ifelse(
-                         rowSums(is.na(df[paste0("bis36_",c(2,31,3,15,18,21,25,14, 20, 33, '30r'))]))==1,
-                         round(rowSums(df[paste0("bis36_",c(2,31,3,15,18,21,25,14, 20, 33, '30r'))],na.rm=T)*11/10), NA)),
-    bis_s_nonplanning=ifelse(rowSums(is.na(df[paste0("bis36_",c('1r','5r','6r','10r','11r',12,'8r', '13r', 16, 28, '35r'))]))==0,
-                             rowSums(df[paste0("bis36_",c('1r','5r','6r','10r','11r',12,'8r', '13r', 16, 28, '35r'))]),ifelse(
-                               rowSums(is.na(df[paste0("bis36_",c('1r','5r','6r','10r','11r',12,'8r', '13r', 16, 28, '35r'))]))==1,
-                               round(rowSums(df[paste0("bis36_",c('1r','5r','6r','10r','11r',12,'8r', '13r', 16, 28, '35r'))],na.rm=T)*11/10), NA))
+  df <- df %>% mutate(
+    bis_s_attentional = ifelse(rowSums(is.na(df[paste0("bis36_",c(31, 32, 33, 34, 35, 36))]))==6, # If pts don't have Q31-Q36: they received BIS-11A, do prorated scoring
+                               ifelse(rowSums(is.na(df[paste0("bis36_",c(4, '7r', '19r', 27, 29))]))==0,
+                                      round(rowSums(df[paste0("bis36_",c(4, '7r', '19r', 27, 29))])*8/5), NA), # Prorated scoring
+                               ifelse(rowSums(is.na(df[paste0("bis36_",c(4, 34, 27, 32, '7r', 36, '19r', 29))]))==0,
+                                      rowSums(df[paste0("bis36_",c(4, 34, 27, 32, '7r', 36, '19r', 29))]), NA)  # BIS-11 scoring
+    ),
+    bis_s_motor = ifelse(rowSums(is.na(df[paste0("bis36_",c(31, 32, 33, 34, 35, 36))]))==6, # If pts don't have Q31-Q36: they received BIS-11A, do prorated scoring
+                         ifelse(rowSums(is.na(df[paste0("bis36_",c(2, 3, 14, 15, 18, 20, 21, 25, '30r'))]))==0,         # Prorated scoring
+                                round(rowSums(df[paste0("bis36_",c(2, 3, 14, 15, 18, 20, 21, 25, '30r'))])*11/9), NA), 
+                         ifelse(rowSums(is.na(df[paste0("bis36_",c(2, 31, 3, 15, 18, 21, 25, 14, 20, 33, '30r'))]))==0, # BIS-11 scoring
+                                rowSums(df[paste0("bis36_",c(2, 31, 3, 15, 18, 21, 25, 14, 20, 33, '30r'))]),
+                                ifelse(rowSums(is.na(df[paste0("bis36_",c(2, 31, 3, 15, 18, 21, 25, 14, 20, 33, '30r'))]))==1, 
+                                       round(rowSums(df[paste0("bis36_",c(2, 31, 3, 15, 18, 21, 25, 14, 20, 33, '30r'))],na.rm=T)*11/10), NA))
+    ),
+    bis_s_nonplanning = ifelse(rowSums(is.na(df[paste0("bis36_",c(31, 32, 33, 34, 35, 36))]))==6, # If pts don't have Q31-Q36: they received BIS-11A, do prorated scoring
+                               ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', '5r', '6r', '8r', '10r', '11r', 12, '13r', 16, 28))]))==0,         # Prorated scoring
+                                      round(rowSums(df[paste0("bis36_",c('1r', '5r', '6r', '8r', '10r', '11r', 12, '13r', 16, 28))])*11/10), 
+                                      ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', '5r', '6r', '8r', '10r', '11r', 12, '13r', 16, 28))]))==1, 
+                                             round(rowSums(df[paste0("bis36_",c('1r', '5r', '6r', '8r', '10r', '11r', 12, '13r', 16, 28))], na.rm=T)*11/9), NA)), # 11/9 = 10/9 (10% missingness) * 11/10 (prorated scoring)
+                               ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', '5r', '6r', '8r', '10r', '11r', 12, '13r', 16, 28, '35r'))]))==0,
+                                      rowSums(df[paste0("bis36_",c('1r', '5r', '6r', '8r', '10r', '11r', 12, '13r', 16, 28, '35r'))]),ifelse(
+                                        rowSums(is.na(df[paste0("bis36_",c('1r', '5r', '6r', '8r', '10r', '11r', 12, '13r', 16, 28, '35r'))]))==1,
+                                        round(rowSums(df[paste0("bis36_",c('1r', '5r', '6r', '8r', '10r', '11r', 12, '13r', 16, 28, '35r'))],na.rm=T)*11/10), NA))
+  ),
+  bis_total = ifelse(rowSums(is.na(df[paste0("bis36_",c(31, 32, 33, 34, 35, 36))]))==6, # If pts don't have Q31-Q36: they received BIS-11A, do prorated scoring
+                     ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r'))]))==0,         # Prorated scoring
+                            round(rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r'))])*30/24), 
+                            ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r'))]))==1, 
+                                   round(rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r'))], na.rm=T)*30/23), # 30/23 = 24/23 (10% missingness) * 30/24 (prorated scoring)
+                                   ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r'))]))==2, 
+                                          round(rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r'))], na.rm=T)*30/22), NA))), # 30/22 = 24/22 (10% missingness) * 30/24 (prorated scoring)
+                     ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))]))==0,
+                            rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))]),
+                            ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))]))==1,
+                                   round(rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))],na.rm=T)*30/29), 
+                                   ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))]))==2,
+                                          round(rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))],na.rm=T)*30/28),
+                                          ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))]))==3,
+                                                 round(rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))],na.rm=T)*30/27), NA))
+                            )))
   )
   return(df)
 }
@@ -317,18 +335,24 @@ score.ctq<-function(df=NULL){
     ctq_26r=6-ctq_26, ctq_28r=6-ctq_28)
   #Subscale scoring
   df <- df %>% mutate(
-    ctq_emotional_abuse = ifelse(rowSums(is.na(CTQ[paste0("ctq_", c(3, 8, 14, 18, 25))]))==0, 
-                                 rowSums(CTQ[paste0("ctq_", c(3, 8, 14, 18, 25))]),NA),
-    ctq_physical_abuse = ifelse(rowSums(is.na(CTQ[paste0("ctq_", c(9, 11, 12, 15, 17))]))==0, 
-                                rowSums(CTQ[paste0("ctq_", c(9, 11, 12, 15, 17))]),NA),
-    ctq_sexual_abuse = ifelse(rowSums(is.na(CTQ[paste0("ctq_", c(20, 21, 23, 24, 27))]))==0, 
-                              rowSums(CTQ[paste0("ctq_", c(20, 21, 23, 24, 27))]),NA),
-    ctq_emotiona_neglect = ifelse(rowSums(is.na(CTQ[paste0("ctq_", c('5r', '7r', '13r', '19r', '28r'))]))==0, 
-                                  rowSums(CTQ[paste0("ctq_", c('5r', '7r', '13r', '19r', '28r'))]),NA),
-    ctq_physical_neglect = ifelse(rowSums(is.na(CTQ[paste0("ctq_", c(1, '2r', 4, 6, '26r'))]))==0, 
-                                  rowSums(CTQ[paste0("ctq_", c(1, '2r', 4, 6, '26r'))]),NA),
-    ctq_minimization = ifelse(rowSums(is.na(CTQ[paste0("ctq_", c(10, 16, 22))]))==0, 
-                              rowSums(CTQ[paste0("ctq_", c(10, 16, 22))]),NA)
+    ctq_emotional_abuse = ifelse(rowSums(is.na(df[paste0("ctq_", c(3, 8, 14, 18, 25))]))==0, 
+                                 rowSums(df[paste0("ctq_", c(3, 8, 14, 18, 25))]),NA),
+    ctq_physical_abuse = ifelse(rowSums(is.na(df[paste0("ctq_", c(9, 11, 12, 15, 17))]))==0, 
+                                rowSums(df[paste0("ctq_", c(9, 11, 12, 15, 17))]),NA),
+    ctq_sexual_abuse = ifelse(rowSums(is.na(df[paste0("ctq_", c(20, 21, 23, 24, 27))]))==0, 
+                              rowSums(df[paste0("ctq_", c(20, 21, 23, 24, 27))]),NA),
+    ctq_emotiona_neglect = ifelse(rowSums(is.na(df[paste0("ctq_", c('5r', '7r', '13r', '19r', '28r'))]))==0, 
+                                  rowSums(df[paste0("ctq_", c('5r', '7r', '13r', '19r', '28r'))]),NA),
+    ctq_physical_neglect = ifelse(rowSums(is.na(df[paste0("ctq_", c(1, '2r', 4, 6, '26r'))]))==0, 
+                                  rowSums(df[paste0("ctq_", c(1, '2r', 4, 6, '26r'))]),NA),
+    ctq_minimization = ifelse(rowSums(is.na(df[paste0("ctq_", c(10, 16, 22))]))==0, 
+                              rowSums(df[paste0("ctq_", c(10, 16, 22))]),NA),
+    ctq_total = ifelse(rowSums(is.na(df[paste0("ctq_", c(3, 8, 14, 18, 25, 9, 11, 12, 15, 17, 20, 21, 23, 24, 27, '5r', '7r', '13r', '19r', '28r', 1, '2r', 4, 6, '26r'))]))==0, 
+                       rowSums(df[paste0("ctq_", c(3, 8, 14, 18, 25, 9, 11, 12, 15, 17, 20, 21, 23, 24, 27, '5r', '7r', '13r', '19r', '28r', 1, '2r', 4, 6, '26r'))]),
+                       ifelse(rowSums(is.na(df[paste0("ctq_", c(3, 8, 14, 18, 25, 9, 11, 12, 15, 17, 20, 21, 23, 24, 27, '5r', '7r', '13r', '19r', '28r', 1, '2r', 4, 6, '26r'))]))==1, 
+                              rowSums(df[paste0("ctq_", c(3, 8, 14, 18, 25, 9, 11, 12, 15, 17, 20, 21, 23, 24, 27, '5r', '7r', '13r', '19r', '28r', 1, '2r', 4, 6, '26r'))])*25/24,
+                              ifelse(rowSums(is.na(df[paste0("ctq_", c(3, 8, 14, 18, 25, 9, 11, 12, 15, 17, 20, 21, 23, 24, 27, '5r', '7r', '13r', '19r', '28r', 1, '2r', 4, 6, '26r'))]))==2,
+                                     rowSums(df[paste0("ctq_", c(3, 8, 14, 18, 25, 9, 11, 12, 15, 17, 20, 21, 23, 24, 27, '5r', '7r', '13r', '19r', '28r', 1, '2r', 4, 6, '26r'))])*25/23, NA)))
   )
   return(df)
 }
