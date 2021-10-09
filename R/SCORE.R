@@ -272,7 +272,7 @@ score.ars<-function(df=NULL){
 }
 
 #BIS-36 Scoring
-bis<-function(df=NULL){
+score.bis<-function(df=NULL){
   df<-df %>% mutate_at(vars(paste0("bis36_",1:36)),as.numeric)
   #Make reverse scores
   df<-df %>% mutate(
