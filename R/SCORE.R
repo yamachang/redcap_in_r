@@ -1,9 +1,8 @@
 #Protect Scoring
 bsrc.score<-function(df=NULL,formname=NULL,...){
   library(dplyr)
-  possible_forms<-c("ssi","ssi","athf","ham","cirsg","scid","sidp","exit","drs","wtar","ars","mmse",
-                    "bis","ctq","isel","iip","neo","paibor","pb","spsi","ssd","ta","uppsp", "fs", "let", 
-                    "swls","maas","ah","bsia","cfcs", "ders", "iri", "nfc", "rand12", "bpni")
+  possible_forms<-c("athf","ham","cirsg","sidp","exit","drs","wtar","mmse",
+                    "bis","ctq","isel","iip","neo","paibor","spsi","ssd","uppsp")
   if(is.null(formname)){
     message("No form name supplied, choose one of these options:")
     print(possible_forms)
@@ -116,9 +115,9 @@ score.cirsg<-function(df=NULL){
                         rowSums(is.na(df[paste("cirsg_",c(1:13),"_s",sep="")]))==1,
                         round(rowSums(df[paste("cirsg_",c(1:13),"_s",sep="")],na.rm=T)*13/12),NA)),
     cirs_3or4=ifelse(rowSums(is.na(df[paste("cirsg_",c(1:13),"_s",sep="")]))==0,
-                     rowSums(cirs[paste("cirsg_",c(1:13),"_s",sep="")]>2),ifelse(
+                     rowSums(df[paste("cirsg_",c(1:13),"_s",sep="")]>2),ifelse(
                        rowSums(is.na(df[paste("cirsg_",c(1:13),"_s",sep="")]))==1,
-                       round(rowSums(cirs[paste("cirsg_",c(1:13),"_s",sep="")]>2,na.rm=T)*13/12),NA))
+                       round(rowSums(df[paste("cirsg_",c(1:13),"_s",sep="")]>2,na.rm=T)*13/12),NA))
   )
   return(df)
 }
@@ -243,7 +242,7 @@ score.drs<-function(df=NULL){
                                  rowSums(df[paste0("drs_",c('v','w','x','y','z','ab'))]),NA),
     drs_memory=ifelse(rowSums(is.na(df[paste0("drs_",c('ac','af','ag','ai','ak'))]))==0,
                       rowSums(df[paste0("drs_",c('ac','af','ag','ai','ak'))]),NA),
-    drs_total=ifelse(rowSums(is.na(df[drs_vars]))==0, rowSums(df[drs_vars]),ifelse(
+    drs_total=ifelse(rowSums(is.na(df))==0, rowSums(df[drs_vars]),ifelse(
       rowSums(is.na(df))==1, round(rowSums(df[drs_vars],na.rm=T)*36/35),ifelse(
         rowSums(is.na(df))==2,round(rowSums(df[drs_vars],na.rm=T)*36/34),ifelse(
           rowSums(is.na(df))==3,round(rowSums(df[drs_vars],na.rm=T)*36/33),NA))))
@@ -305,23 +304,23 @@ score.bis<-function(df=NULL){
                                       rowSums(df[paste0("bis36_",c('1r', '5r', '6r', '8r', '10r', '11r', 12, '13r', 16, 28, '35r'))]),ifelse(
                                         rowSums(is.na(df[paste0("bis36_",c('1r', '5r', '6r', '8r', '10r', '11r', 12, '13r', 16, 28, '35r'))]))==1,
                                         round(rowSums(df[paste0("bis36_",c('1r', '5r', '6r', '8r', '10r', '11r', 12, '13r', 16, 28, '35r'))],na.rm=T)*11/10), NA))
-  ),
-  bis_total = ifelse(rowSums(is.na(df[paste0("bis36_",c(31, 32, 33, 34, 35, 36))]))==6, # If pts don't have Q31-Q36: they received BIS-11A, do prorated scoring
-                     ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r'))]))==0,         # Prorated scoring
-                            round(rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r'))])*30/24), 
-                            ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r'))]))==1, 
-                                   round(rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r'))], na.rm=T)*30/23), # 30/23 = 24/23 (10% missingness) * 30/24 (prorated scoring)
-                                   ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r'))]))==2, 
-                                          round(rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r'))], na.rm=T)*30/22), NA))), # 30/22 = 24/22 (10% missingness) * 30/24 (prorated scoring)
-                     ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))]))==0,
-                            rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))]),
-                            ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))]))==1,
-                                   round(rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))],na.rm=T)*30/29), 
-                                   ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))]))==2,
-                                          round(rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))],na.rm=T)*30/28),
-                                          ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))]))==3,
-                                                 round(rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))],na.rm=T)*30/27), NA))
-                            )))
+    ),
+    bis_total = ifelse(rowSums(is.na(df[paste0("bis36_",c(31, 32, 33, 34, 35, 36))]))==6, # If pts don't have Q31-Q36: they received BIS-11A, do prorated scoring
+                       ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r'))]))==0,         # Prorated scoring
+                              round(rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r'))])*30/24), 
+                              ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r'))]))==1, 
+                                     round(rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r'))], na.rm=T)*30/23), # 30/23 = 24/23 (10% missingness) * 30/24 (prorated scoring)
+                                     ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r'))]))==2, 
+                                            round(rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r'))], na.rm=T)*30/22), NA))), # 30/22 = 24/22 (10% missingness) * 30/24 (prorated scoring)
+                       ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))]))==0,
+                              rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))]),
+                              ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))]))==1,
+                                     round(rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))],na.rm=T)*30/29), 
+                                     ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))]))==2,
+                                            round(rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))],na.rm=T)*30/28),
+                                            ifelse(rowSums(is.na(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))]))==3,
+                                                   round(rowSums(df[paste0("bis36_",c('1r', 2, 3, 4, '5r', '6r', '7r', '8r', '10r', '11r', 12, '13r', 14, 15, 16, 18, '19r', 20, 21, 25, 27, 28, 29, '30r', 31, 32, 33, 34, '35r', 36))],na.rm=T)*30/27), NA))
+                              )))
   )
   return(df)
 }
@@ -469,7 +468,7 @@ score.pb<-function(df=NULL){
 
 #SPSI scoring
 score.spsi<-function(df=NULL){
-  df<-df %>% mutate_at(vars(paste0("spsi",c(1:25)),as.numeric))  
+  df<-df %>% mutate_at(vars(paste0("spsi_",1:25),as.numeric))  
   df<-df %>% mutate(
     #Subscores (positive and rational are positive, negative, impulsecare and avoid are negative)
     spsi_pos_problemorient=ifelse(rowSums(is.na(df[paste0("spsi_",c(4,5,9,13,15))]))==0,
@@ -547,7 +546,6 @@ score.ta<-function(df=NULL){
     ta_total=ifelse(rowSums(is.na(df[paste0("ta_",1:7)]))==0,
                     rowSums(df[paste0("ta_",1:7)]),NA)
   )
-  return(df)
 }
 
 #UPPSP scoring
@@ -595,286 +593,5 @@ score.uppsp<-function(df=NULL){
                                                                           na.rm=T)*14/13),NA))
     
   )
-  return(df)
-}
-
-#FS scoring
-score.fs <- function(df=NULL){
-  df <- df %>% mutate_at(vars(paste0("fs_",c(1:8))),as.numeric)%>% 
-    mutate(
-      fs_total= ifelse(rowSums(is.na(df[paste0("fs_",c(1:8))]))==0,
-                       rowSums(df[paste0("fs_",c(1:8))]), NA)
-    )
-  return(df)
-}
-
-#LET scoring
-score.let <- function(df=NULL){
-  df <- df %>% mutate_at(vars(paste0("let_",c(1:6))),as.numeric)
-  df <- df %>% mutate(let_1=6-let_1, let_3=6-let_3,let_5=6-let_5)
-  
-  df <- df%>% mutate(LET_total= ifelse(rowSums(is.na(df[paste0("let_",c(1:6))]))==0,
-                                       rowSums(df[paste0("let_",c(1:6))]), NA)
-  )
-  return(df)
-}
-
-#SWLS scoring
-score.swls <- function (df=NULL){
-  df <- df %>% mutate_at(vars(paste0("swls_",c(1:5)),as.numeric))
-  df <- df%>% mutate(swls_total= ifelse(rowSums(is.na(df[paste0("swls_",c(1:5))]))==0,
-                                        rowSums(df[paste0("swls_",c(1:5))]), NA)
-  )
-  return(df)
-}
-
-#MAAS scoring 
-score.maas <- function(df=NULL){
-  df <- df %>% mutate_at(vars(paste0("maas_",1:15)),as.numeric)
-  
-  df <- df %>% mutate(
-    maas_mean=ifelse(rowSums(is.na(df[paste0("maas_",c(1:15))]))==0,
-                     rowSums(df[paste0("maas_",c(1:15))])/15,ifelse(
-                       rowSums(is.na(df[paste0("maas_",c(1:15))]))==1,
-                       round(rowSums(df[paste0("maas_",c(1:15))],na.rm=T)*15/14)/14,NA)
-    ))
-  return(df)
-}
-
-#ah scoring
-score.ah <- function(df=NULL){
-  df <- df %>% mutate_at(vars(paste0("ah_",c(1:14))),as.numeric)%>% 
-    mutate(ah_total=ifelse(rowSums(is.na(df[paste0("ah_",c(1:14))]))==0,
-                           rowSums(df[paste0("ah_",c(1:14))]),ifelse(
-                             rowSums(is.na(df[paste0("ah_",c(1:14))]))==1,
-                             round(rowSums(df[paste0("ah_",c(1:14))],na.rm=T)*14/13),NA))
-    )
-  return(df)
-}
-
-#BSIA scoring
-score.bsia <- function (df=NULL){
-  df <- df %>% mutate_at(vars(paste0("bsi_a_",c(1:6))),as.numeric)%>% 
-    mutate(bsia_total=ifelse(rowSums(is.na(df[paste0("bsi_a_",c(1:6))]))==0,
-                             rowSums(df[paste0("bsi_a_",c(1:6))]),ifelse(
-                               rowSums(is.na(df[paste0("bsi_a_",c(1:6))]))==1,
-                               round(rowSums(df[paste0("bsi_a_",c(1:6))],na.rm=T)*6/5),NA))
-    )
-  return(df)
-}
-
-#CFCS scoring
-score.cfcs <- function (df=NULL){
-  df <- df %>% mutate_at(vars(paste0("cfcs_",c(1:12))),as.numeric)%>% 
-    mutate(cfcs_total=ifelse(rowSums(is.na(df[paste0("cfcs_",c(1:12))]))==0,
-                             rowSums(df[paste0("cfcs_",c(1:12))]),ifelse(
-                               rowSums(is.na(df[paste0("cfcs_",c(1:12))]))==1,
-                               round(rowSums(df[paste0("cfcs_",c(1:12))],na.rm=T)*12/11),NA))
-    )
-  return(df)
-}
-
-#ders scoring
-df <- df %>% mutate_at(vars(paste0("ders_",1:36)),as.numeric)%>%
-  mutate(ders_20R=6-ders_20,
-         ders_24R=6-ders_24,
-         ders_2R=6-ders_2,
-         ders_6R=6-ders_6,
-         ders_8R=6-ders_8,
-         ders_10R=6-ders_10,
-         ders_17R=6-ders_17,
-         ders_34R=6-ders_34,
-         ders_22R=6-ders_22,
-         ders_1R=6-ders_1,
-         ders_7R=6-ders_7)
-
-
-df <- df %>%mutate(ders_nonacceptance = ifelse(rowSums(is.na(df[paste0("ders_", c(25, 21, 12, 11, 23,29))]))==0, 
-                                               rowSums(df[paste0("ders_", c(25, 21, 12, 11, 23,29))]),NA),
-                   ders_goals = ifelse(rowSums(is.na(df[paste0("ders_", c(13,18,'20R',26,33))]))==0, 
-                                       rowSums(df[paste0("ders_", c(13,18,'20R',26,33))]),NA),
-                   ders_imupsitivty = ifelse(rowSums(is.na(df[paste0("ders_", c(3, 14, 19, '24R', 27, 32))]))==0, 
-                                             rowSums(df[paste0("ders_", c(3, 14, 19, '24R', 27, 32))]),NA),
-                   ders_awareness = ifelse(rowSums(is.na(df[paste0("ders_", c('2R', '6R', '8R', '10R', '17R', '34R'))]))==0, 
-                                           rowSums(df[paste0("ders_", c('2R', '6R', '8R', '10R', '17R', '34R'))]),NA),
-                   ders_strategies = ifelse(rowSums(is.na(df[paste0("ders_", c(15, 16, '22R', 28, 30, 31, 35, 36))]))==0, 
-                                            rowSums(df[paste0("ders_", c(15, 16, '22R', 28, 30, 31, 35, 36))]),NA),
-                   ders_clarity = ifelse(rowSums(is.na(df[paste0("ders_", c('1R', 4, 5, '7R', 9))]))==0, 
-                                         rowSums(df[paste0("ders_", c('1R', 4, 5, '7R', 9))]),NA))
-
-df <- df %>% mutate_at(vars(paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
-                                             16, '22R', 28, 30, 31, 35, 36,'1R', 4, 5, '7R', 9))),as.numeric)%>% 
-  mutate(ders_total=ifelse(rowSums(is.na(dersraw[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
-                                                                  16, '22R', 28, 30, 31, 35, 36,'1R', 4, 5, '7R', 9))]))==0,
-                           rowSums(dersraw[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
-                                                            16, '22R', 28, 30, 31, 35, 36,'1R', 4, 5, '7R', 9))]),ifelse(
-                                                              rowSums(is.na(dersraw[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
-                                                                                                     16, '22R', 28, 30, 31, 35, 36,'1R', 4, 5, '7R', 9))]))==1,
-                                                              round(rowSums(dersraw[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
-                                                                                                     16, '22R', 28, 30, 31, 35, 36,'1R', 4, 5, '7R', 9))],na.rm=T)*36/35),ifelse(
-                                                                                                       rowSums(is.na(dersraw[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
-                                                                                                                                              16, '22R', 28, 30, 31, 35, 36,'1R', 4, 5, '7R', 9))]))==2,
-                                                                                                       round(rowSums(dersraw[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
-                                                                                                                                              16, '22R', 28, 30, 31, 35, 36,'1R', 4, 5, '7R', 9))],na.rm=T)*36/34), ifelse(
-                                                                                                                                                rowSums(is.na(dersraw[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
-                                                                                                                                                                                       16, '22R', 28, 30, 31, 35, 36,'1R', 4, 5, '7R', 9))]))==3,
-                                                                                                                                                
-                                                                                                                                                round(rowSums(dersraw[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
-                                                                                                                                                                                       16, '22R', 28, 30, 31, 35, 36,'1R', 4, 5, '7R', 9))],na.rm=T)*36/33),NA))))
-  )
-return (df)
-}
-
-#IRI scoring 
-score.iri <- function (df=NULL) {
-  df <- df %>% mutate_at(vars(paste0("iri_",1:28)),as.numeric)%>%
-    mutate(iri_7R=4-iri_7,
-           iri_12R=4-iri_12)
-  
-  
-  df <- df %>%mutate(iri_fantasy = ifelse(rowSums(is.na(df[paste0("iri_", c(26,5,'7R','16','1','12R','23'))]))==0, 
-                                          rowSums(df[paste0("iri_", c(26,5,'7R','16','1','12R','23'))]),NA),
-                     iri_pers_taking = ifelse(rowSums(is.na(df[paste0("iri_", c(28,15,11,21,3,8,25))]))==0, 
-                                              rowSums(df[paste0("iri_", c(28,15,11,21,3,8,25 ))]),NA),
-                     iri_empath_concern = ifelse(rowSums(is.na(df[paste0("iri_", c(9, 18, 2, 22, 4, 14, 20))]))==0, 
-                                                 rowSums(df[paste0("iri_", c(9, 18, 2, 22, 4, 14, 20))]),NA),
-                     iri_pers_distress = ifelse(rowSums(is.na(df[paste0("iri_", c(27,10,6,19,17,13,24))]))==0, 
-                                                rowSums(df[paste0("iri_", c(27,10,6,19,17,13,24))]),NA)
-  )
-  return(df)
-}
-
-#NFC scoring
-score.nfc <- function (df=NULL) {
-  df <- df %>% mutate_at(vars(paste0("nfc_",c(1:15))),as.numeric)%>% 
-    mutate(nfc_total=ifelse(rowSums(is.na(df[paste0("nfc_",c(1:15))]))==0,
-                            rowSums(df[paste0("nfc_",c(1:15))]),ifelse(
-                              rowSums(is.na(df[paste0("nfc_",c(1:15))]))==1,
-                              round(rowSums(df[paste0("nfc_",c(1:15))],na.rm=T)*15/14),NA))
-    )
-  return (df)
-}
-
-#RAND12 scoring
-score.rand12 <- function (df=NULL){
-  names(df) <- c("masterdemoid",'redcap_event_name',"gh1", "pf02", "pf04", "rp2", "rp3", "re2", "re3", "bp2",
-                 "mh3", "vt2", "mh4", "sf2" )
-  
-  twopt <- c("rp2", "rp3", "re2", "re3")
-  threept <- c("pf02", "pf04")
-  fivept <- c("gh1", "bp2", "sf2")
-  sixpt <- c("vt2", "mh3", "mh4")
-  outRangeNA <- function(x, Min = 1L, Max) replace(x, x < Min | x > Max, NA)
-  
-  df[, twopt] <- lapply(df[, twopt], outRangeNA, Max = 2L)
-  df[, threept] <- lapply(df[, threept], outRangeNA, Max = 3L)
-  df[, fivept] <- lapply(df[, fivept], outRangeNA, Max = 5L)
-  df[, sixpt] <- lapply(df[, sixpt], outRangeNA, Max = 6L)
-  
-  
-  df$rbp2  <-  6 - df$bp2
-  df$rgh1  <-  6 - df$gh1
-  df$rvt2  <-  7 - df$vt2
-  df$rmh3  <-  7 - df$mh3
-  
-  
-  df$pf02_1 <- as.numeric(df$pf02 == 1L) 
-  df$pf02_2 <- as.numeric(df$pf02 == 2L) 
-  
-  df$pf04_1 <- as.numeric(df$pf04 == 1L) 
-  df$pf04_2 <- as.numeric(df$pf04 == 2L) 
-  
-  
-  df$rp2_1 <- as.numeric(df$rp2 == 1L) 
-  
-  
-  df$rp3_1 <- as.numeric(df$rp3 == 1L) 
-  
-  df$bp2_1 <- as.numeric(df$rbp2 == 1L) 
-  df$bp2_2 <- as.numeric(df$rbp2 == 2L) 
-  df$bp2_3 <- as.numeric(df$rbp2 == 3L) 
-  df$bp2_4 <- as.numeric(df$rbp2 == 4L) 
-  
-  df$gh1_1 <- as.numeric(df$rgh1 == 1L) 
-  df$gh1_2 <- as.numeric(df$rgh1 == 2L) 
-  df$gh1_3 <- as.numeric(df$rgh1 == 3L) 
-  df$gh1_4 <- as.numeric(df$rgh1 == 4L) 
-  
-  
-  df$vt2_1 <- as.numeric(df$rvt2 == 1L) 
-  df$vt2_2 <- as.numeric(df$rvt2 == 2L) 
-  df$vt2_3 <- as.numeric(df$rvt2 == 3L) 
-  df$vt2_4 <- as.numeric(df$rvt2 == 4L) 
-  df$vt2_5 <- as.numeric(df$rvt2 == 5L) 
-  
-  
-  
-  df$sf2_1 <- as.numeric(df$sf2 == 1L) 
-  df$sf2_2 <- as.numeric(df$sf2 == 2L) 
-  df$sf2_3 <- as.numeric(df$sf2 == 3L) 
-  df$sf2_4 <- as.numeric(df$sf2 == 4L) 
-  
-  
-  df$re2_1 <- as.numeric(df$re2 == 1L) 
-  
-  
-  df$re3_1 <- as.numeric(df$re3 == 1L) 
-  
-  
-  
-  df$mh3_1 <- as.numeric(df$rmh3 == 1L) 
-  df$mh3_2 <- as.numeric(df$rmh3 == 2L) 
-  df$mh3_3 <- as.numeric(df$rmh3 == 3L) 
-  df$mh3_4 <- as.numeric(df$rmh3 == 4L) 
-  df$mh3_5 <- as.numeric(df$rmh3 == 5L) 
-  
-  
-  
-  df$mh4_1 <- as.numeric(df$mh4 == 1L) 
-  df$mh4_2 <- as.numeric(df$mh4 == 2L) 
-  df$mh4_3 <- as.numeric(df$mh4 == 3L) 
-  df$mh4_4 <- as.numeric(df$mh4 == 4L) 
-  df$mh4_5 <- as.numeric(df$mh4 == 5L) 
-  
-  
-  
-  df <- df %>% mutate(PCS12=((-7.23216*pf02_1) + (-3.45555*pf02_2) +(-6.24397*pf04_1) + (-2.73557*pf04_2) +
-                               (-4.61617*rp2_1) + (-5.51747*rp3_1) +(-11.25544*bp2_1) + (-8.38063*bp2_2) +
-                               (-6.50522*bp2_3) + (-3.80130*bp2_4) + (-8.37399*gh1_1) +(-5.56461*gh1_2) + 
-                               (-3.02396*gh1_3) + (-1.31872*gh1_4) + (-2.44706*vt2_1) + (-2.02168*vt2_2) + 
-                               (-1.6185*vt2_3) +(-1.14387*vt2_4) + (-0.42251*vt2_5) + (-0.33682*sf2_1) +
-                               (-0.94342*sf2_2) + (-0.18043*sf2_3) + (0.11038*sf2_4) +(3.04365*re2_1) + 
-                               (2.32091*re3_1) + (3.46638*mh3_1) + (2.90426*mh3_2) + (2.37241*mh3_3) + 
-                               (1.36689*mh3_4) + (0.66514*mh3_5) + (4.61446*mh4_1) + (3.41593*mh4_2) +
-                               (2.34247*mh4_3) + (1.28044*mh4_4) + (0.41188*mh4_5))+56.57706,
-                      MCS12=((3.93115*pf02_1) + (1.8684*pf02_2) +(2.68282*pf04_1) + (1.43103*pf04_2) + (1.4406*rp2_1) +
-                               (1.66968*rp3_1) + (1.48619*bp2_1) + (1.76691*bp2_2) +(1.49384*bp2_3) + (0.90384*bp2_4) + 
-                               (-1.71175*gh1_1) + (-0.16891*gh1_2) + (0.03482*gh1_3) + (-0.06064*gh1_4) + 
-                               (-6.02409*vt2_1) + (-4.88962*vt2_2) + (-3.29805*vt2_3) + (-1.65178*vt2_4) + (-0.92057*vt2_5) + (-6.29724*sf2_1) +
-                               (-8.26066*sf2_2) + (-5.63286*sf2_3) + (-3.13896*sf2_4) +(-6.82672*re2_1) + (-5.69921*re3_1) + (-10.19085*mh3_1) +
-                               (-7.92717*mh3_2) + (-6.31121*mh3_3) + (-4.09842*mh3_4) +(-1.94949*mh3_5) + (-16.15395*mh4_1) + (-10.77911*mh4_2) +
-                               (-8.09914*mh4_3) + (-4.59055*mh4_4) + (-1.95934*mh4_5))+60.75781)
-  return(df)
-  
-}
-
-#BPNI scoring
-score.bpni <- function(df=NULL){
-  df <- df %>% mutate_at(vars(paste0("bpni_",c(1:28))),as.numeric)%>% 
-    mutate(bpni_exploit = ifelse(rowSums(is.na(df[paste0("bpni_", c(1,4,6,11))]))==0, 
-                                 rowSums(df[paste0("bpni_", c(1,4,6,11))]),NA),
-           bpni_enhancement = ifelse(rowSums(is.na(df[paste0("bpni_", c(10,12,19,24))]))==0, 
-                                     rowSums(df[paste0("bpni_", c(10,12,19,24))]),NA),
-           bpni_grandiosity = ifelse(rowSums(is.na(df[paste0("bpni_", c(13,17,25,26))]))==0, 
-                                     rowSums(df[paste0("bpni_", c(13,17,25,26))]),NA),
-           bpni_esteem = ifelse(rowSums(is.na(df[paste0("bpni_", c(2,16,18,21))]))==0, 
-                                rowSums(df[paste0("bpni_", c(2,16,18,21))]),NA),
-           bpni_hiding = ifelse(rowSums(is.na(df[paste0("bpni_", c(3,15,27,28))]))==0, 
-                                rowSums(df[paste0("bpni_", c(3,15,27,28))]),NA),
-           bpni_devaluing = ifelse(rowSums(is.na(df[paste0("bpni_", c(14,9,27,20))]))==0, 
-                                   rowSums(df[paste0("bpni_", c(14,9,27,20))]),NA),
-           bpni_rage = ifelse(rowSums(is.na(df[paste0("bpni_", c(5,8,22,23))]))==0, 
-                              rowSums(df[paste0("bpni_", c(5,8,22,23))]),NA)
-    )
   return(df)
 }
