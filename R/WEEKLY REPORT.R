@@ -96,8 +96,6 @@ p3.weekly.report<-function(enddate= Sys.Date(), grabnew=T){
                   (is.na(reg_term_yesno_protect3) | reg_term_yesno_protect3!=1) |
                   masterdemoid=="440156")->p3
   
-  
-  
 #Grab Protect data and make a dataframe
   #Get variables from the master demo
     pro<-pt$data %>% select(registration_redcapid,redcap_event_name,
@@ -314,6 +312,8 @@ p3.weekly.report<-function(enddate= Sys.Date(), grabnew=T){
         ed <- as.POSIXlt(end_date)
         sd <- as.POSIXlt(start_date)
         12 * (ed$year - sd$year) + (ed$mon - sd$mon)}
+    p3$registration_initials[num.mo(p3$reg_condate_protect3)/12==1]
+    
     for (i in 1:nrow(df)){
     if(threemo){
        if(num.mo(df[i, paste0("reg_condate_protect",x)])==3){
@@ -358,9 +358,11 @@ p3.weekly.report<-function(enddate= Sys.Date(), grabnew=T){
   
 #If p3 person is a catchup, remove their month 3
   if(any(p3$reg_p3catchup=="P2")){
-  p3[-which(p3$reg_p3catchup=="P2" & 
-             (p3$`Next month`=="3 Month" | p3$`This month`=="3 Month")),]->p3}
-  
+    p3 %>% filter(!(p3$reg_p3catchup=="P2" & (p3$`Next month`=="3 Month" | p3$`This month`=="3 Month"))) -> p3
+    #p3[-which(p3$reg_p3catchup=="P2" &  ### original code
+    #         (p3$`Next month`=="3 Month" | p3$`This month`=="3 Month")),]->p3_old   ### original code
+    }
+
 #Put all people together
   ymd(p3$reg_condate_protect2)->p3$reg_condate_protect2
   merge(merge(p2,p2p3,all=T),p3,all=T)->fus
