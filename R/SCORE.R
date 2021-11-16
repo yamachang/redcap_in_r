@@ -3,7 +3,7 @@ bsrc.score<-function(df=NULL,formname=NULL,...){
   library(dplyr)
   possible_forms<-c("ssi","sis","athf","ham","cirsg","sidp","exit","drs","wtar","mmse","ars",
                     "bis","ctq","isel","iip","ta","neo","paibor","spsi","ssd","uppsp","fs", "let", 
-                    "swls","maas","ah","bsia","cfcs", "ders", "iri", "nfc", "rand12", "bpni")
+                    "swls","maas","ah","bsia","cfcs", "ders", "iri", "nfc", "rand12", "bpni" ,"bhs","ipipds")
   if(is.null(formname)){
     message("No form name supplied, choose one of these options:")
     print(possible_forms)
@@ -887,8 +887,28 @@ score.bpni <- function(df=NULL){
   return(df)
 }
 
+#BHS scoring
+score.bhs <- function(df=NULL){
+  names(df)[3:22] = paste0("beckhope_", 1:20)
+  df<-df %>% mutate_at(vars(paste0("beckhope_",c(1:20))),as.numeric)  
+  
+  df <- df %>% mutate(bhs_total=ifelse(rowSums(is.na(df[paste0("beckhope_", c(1:20))]))==0, 
+                                               rowSums(df[paste0("beckhope_", c(1:20))]),
+                                               ifelse(rowSums(is.na(df[paste0("beckhope_", c(1:20))]))==1, 
+                                                      rowSums(df[paste0("beckhope_", c(1:20))])*20/19,
+                                                      ifelse(rowSums(is.na(df[paste0("beckhope_", c(1:20))]))==2,
+                                                             rowSums(df[paste0("beckhope_", c(1:20))])*20/18, NA))))
 
+return(df)
+}
 
+#ipipds scoring
 
-
-
+score.ipipds <- function(df=NULL){
+  df <- df %>% mutate(
+    ipipds_total=ifelse(rowSums(is.na(df[paste0("ipipds_",c(1:11))]))==0,
+                        rowSums(df[paste0("ipipds_",c(1:11))]),ifelse(
+                          rowSums(is.na(df[paste0("ipipds_",c(1:11))]))==1,
+                          round(rowSums(df[paste0("ipipds_",c(1:11))],na.rm=T)*11/10),NA)))
+  return(df)
+}
