@@ -764,6 +764,7 @@ score.nfc <- function (df=NULL) {
 
 #RAND12 scoring
 score.rand12 <- function (df=NULL){
+  df <- df %>% select(-rand12_complete,-rand12_admin)
   names(df) <- c("masterdemoid",'redcap_event_name',"gh1", "pf02", "pf04", "rp2", "rp3", "re2", "re3", "bp2",
                  "mh3", "vt2", "mh4", "sf2" )
   
