@@ -1,7 +1,7 @@
 #Protect Scoring
 bsrc.score<-function(df=NULL,formname=NULL,...){
   library(dplyr)
-  possible_forms<-c("athf","ham","cirsg","sidp","exit","drs","wtar","mmse",
+  possible_forms<-c("athf","ham","cirsg","sidp","exit","drs","wtar","mmse","ars",
                     "bis","ctq","isel","iip","neo","paibor","spsi","ssd","uppsp","fs", "let", 
                     "swls","maas","ah","bsia","cfcs", "ders", "iri", "nfc", "rand12", "bpni")
   if(is.null(formname)){
@@ -473,7 +473,7 @@ score.pb<-function(df=NULL){
 
 #SPSI scoring
 score.spsi<-function(df=NULL){
-  df<-df %>% mutate_at(vars(paste0("spsi_",c(1:25))),as.numeric)  
+  df<-df %>% mutate_at(vars(paste0("spsi_",c(1:25))), as.numeric)  
   df<-df %>% mutate(
     #Subscores (positive and rational are positive, negative, impulsecare and avoid are negative)
     spsi_pos_problemorient=ifelse(rowSums(is.na(df[paste0("spsi_",c(4,5,9,13,15))]))==0,
@@ -627,7 +627,7 @@ score.swls <- function (df=NULL){
   paste0("swls_",1:5)->names(df)[names(df) %in% c("swls_ideal","swls_excellent","swls_satisfied","swls_important","swls_no_change")]
   df <- df %>% 
     mutate_at(vars(paste0("swls_",c(1:5))),as.numeric)%>%
-    mutate(swls_total= ifelse(rowSums(is.na(df[paste0("swls_",c(1:5))]))==0,rowSums(df[paste0("swls_",c(1:5))]), NA))
+    mutate(swls_total=ifelse(rowSums(is.na(df[paste0("swls_",c(1:5))]))==0,rowSums(df[paste0("swls_",c(1:5))]), NA))
   
   return(df)
 }
@@ -681,7 +681,7 @@ score.cfcs <- function (df=NULL){
 
 #ders scoring
 score.ders <- function (df=NULL){
-  df <- df %>% mutate_at(vars(paste0("ders_",1:36)),as.numeric)%>%
+  df <- df %>% mutate_at(vars(paste0("ders_",1:36)), as.numeric)%>%
     mutate(ders_20R=6-ders_20,
            ders_24R=6-ders_24,
            ders_2R=6-ders_2,
@@ -710,22 +710,22 @@ score.ders <- function (df=NULL){
   
   df <- df %>% mutate_at(vars(paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
                                                16, '22R', 28, 30, 31, 35, 36,'1R', 4, 5, '7R', 9))),as.numeric)%>% 
-    mutate(ders_total=ifelse(rowSums(is.na(dersraw[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
+    mutate(ders_total=ifelse(rowSums(is.na(df[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
                                                                     16, '22R', 28, 30, 31, 35, 36,'1R', 4, 5, '7R', 9))]))==0,
-                             rowSums(dersraw[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
+                             rowSums(df[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
                                                               16, '22R', 28, 30, 31, 35, 36,'1R', 4, 5, '7R', 9))]),ifelse(
-                                                                rowSums(is.na(dersraw[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
+                                                                rowSums(is.na(df[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
                                                                                                        16, '22R', 28, 30, 31, 35, 36,'1R', 4, 5, '7R', 9))]))==1,
-                                                                round(rowSums(dersraw[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
+                                                                round(rowSums(df[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
                                                                                                        16, '22R', 28, 30, 31, 35, 36,'1R', 4, 5, '7R', 9))],na.rm=T)*36/35),ifelse(
-                                                                                                         rowSums(is.na(dersraw[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
+                                                                                                         rowSums(is.na(df[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
                                                                                                                                                 16, '22R', 28, 30, 31, 35, 36,'1R', 4, 5, '7R', 9))]))==2,
-                                                                                                         round(rowSums(dersraw[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
+                                                                                                         round(rowSums(df[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
                                                                                                                                                 16, '22R', 28, 30, 31, 35, 36,'1R', 4, 5, '7R', 9))],na.rm=T)*36/34), ifelse(
-                                                                                                                                                  rowSums(is.na(dersraw[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
+                                                                                                                                                  rowSums(is.na(df[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
                                                                                                                                                                                          16, '22R', 28, 30, 31, 35, 36,'1R', 4, 5, '7R', 9))]))==3,
                                                                                                                                                   
-                                                                                                                                                  round(rowSums(dersraw[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
+                                                                                                                                                  round(rowSums(df[paste0("ders_",c(25, 21, 12, 11, 23,29,13,18,'20R',26,33,3, 14, 19, '24R', 27, 32,'2R', '6R', '8R', '10R', '17R', '34R',15, 
                                                                                                                                                                                          16, '22R', 28, 30, 31, 35, 36,'1R', 4, 5, '7R', 9))],na.rm=T)*36/33),NA))))
     )
   return (df)
