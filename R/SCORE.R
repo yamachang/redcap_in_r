@@ -603,6 +603,7 @@ score.uppsp<-function(df=NULL){
 
 #FS scoring
 score.fs <- function(df=NULL){
+  paste0("fs_",1:8)->names(df)[names(df) %in% c("fs_purpose","fs_rewarding_relationships","fs_engaged","fs_contribute","fs_competent","fs_goodperson","fs_optimistic","fs_respect")]
   df <- df %>% mutate_at(vars(paste0("fs_",c(1:8))),as.numeric)%>% 
     mutate(
       fs_total= ifelse(rowSums(is.na(df[paste0("fs_",c(1:8))]))==0,
