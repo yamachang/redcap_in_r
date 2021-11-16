@@ -624,10 +624,11 @@ score.let <- function(df=NULL){
 
 #SWLS scoring
 score.swls <- function (df=NULL){
-  df <- df %>% mutate_at(vars(paste0("swls_",c(1:5)),as.numeric))
-  df <- df%>% mutate(swls_total= ifelse(rowSums(is.na(df[paste0("swls_",c(1:5))]))==0,
-                                        rowSums(df[paste0("swls_",c(1:5))]), NA)
-  )
+  paste0("swls_",1:5)->names(df)[names(df) %in% c("swls_ideal","swls_excellent","swls_satisfied","swls_important","swls_no_change")]
+  df <- df %>% mutate_at(vars(paste0("swls_",c(1:5))),as.numeric)%>%
+    mutate(swls_total= ifelse(rowSums(is.na(df[paste0("swls_",c(1:5))]))==0,rowSums(df[paste0("swls_",c(1:5))]), NA)
+           )
+  
   return(df)
 }
 
