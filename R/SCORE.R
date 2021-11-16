@@ -1,8 +1,8 @@
 #Protect Scoring
 bsrc.score<-function(df=NULL,formname=NULL,...){
   library(dplyr)
-  possible_forms<-c("athf","ham","cirsg","sidp","exit","drs","wtar","mmse","ars",
-                    "bis","ctq","isel","iip","neo","paibor","spsi","ssd","uppsp","fs", "let", 
+  possible_forms<-c("ssi","sis","athf","ham","cirsg","sidp","exit","drs","wtar","mmse","ars",
+                    "bis","ctq","isel","iip","ta","neo","paibor","spsi","ssd","uppsp","fs", "let", 
                     "swls","maas","ah","bsia","cfcs", "ders", "iri", "nfc", "rand12", "bpni")
   if(is.null(formname)){
     message("No form name supplied, choose one of these options:")
