@@ -473,7 +473,7 @@ score.pb<-function(df=NULL){
 
 #SPSI scoring
 score.spsi<-function(df=NULL){
-  df<-df %>% mutate_at(vars(paste0("spsi_",c(1:25)),as.numeric)  
+  df<-df %>% mutate_at(vars(paste0("spsi_",1:25)),as.numeric)  
   df<-df %>% mutate(
     #Subscores (positive and rational are positive, negative, impulsecare and avoid are negative)
     spsi_pos_problemorient=ifelse(rowSums(is.na(df[paste0("spsi_",c(4,5,9,13,15))]))==0,
