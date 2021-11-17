@@ -346,7 +346,7 @@ p3.weekly.report<-function(enddate= Sys.Date(), grabnew=T){
       df[which(!is.na(df$`This month`) | !is.na(df$`Next month`)),]->df
       return(df)}
   as.data.frame(p2)->p2
-  fu_schedule(p2, 2, IDE=F)->p2
+  fu_schedule(p2, x=2, IDE=F)->p2
   #Protect 3's also in Protect 2 follow old protect 2 schedule of followups
   fu_schedule(p2p3, x=2, threemo = F)->p2p3
   fu_schedule(p3, x=3)->p3
@@ -356,9 +356,15 @@ p3.weekly.report<-function(enddate= Sys.Date(), grabnew=T){
   if(nrow(p2p3)>0){p2p3$followup<-"PROTECT3"}
   if(nrow(p3)>0){p3$followup<-"PROTECT3"}
   
+
 #If p3 person is a catchup, remove their month 3
   if(any(p3$reg_p3catchup=="P2")){
-    p3 %>% filter(!(p3$reg_p3catchup=="P2" & (p3$`Next month`=="3 Month" | p3$`This month`=="3 Month"))) -> p3
+    p3_catchup_mo3 <- p3 %>% filter(p3$reg_p3catchup == "P2" & p3$`Next month` == "3 Month")
+    p3_catchup_mo32 <- p3 %>% filter(p3$reg_p3catchup == "P2" & p3$`This month` == "3 Month")
+    ID_remove <- paste0(p3_catchup_mo3$masterdemoid, p3_catchup_mo32$masterdemoid, collapse = ",") 
+    
+    p3 <- p3 %>% filter(!masterdemoid %in% ID_remove)
+    
     #p3[-which(p3$reg_p3catchup=="P2" &  ### original code
     #         (p3$`Next month`=="3 Month" | p3$`This month`=="3 Month")),]->p3_old   ### original code
     }
