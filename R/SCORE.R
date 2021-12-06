@@ -31,8 +31,7 @@ score.ssi<-function(df=NULL){
     # dk/refuse/na/NA = NA, items 1-5
     mutate_at(vars(paste0("ssi_",c(1:5),"_worst"),paste0("ssi_",c(1:5),"_curr")),~replace(.,.=="na"|.=="dk"|.=="refuse",NA)) %>% 
     mutate_at(vars(paste0("ssi_",c(1:19),"_worst"),paste0("ssi_",c(1:19),"_curr")), ~as.integer(.)) %>%  # convert them to integer for scoring in the next step 
-    select(masterdemoid, redcap_event_name, paste0("ssi_",c(1:19),"_worst"),paste0("ssi_",c(1:19),"_curr")) %>% 
-    filter(masterdemoid %in% ID_DNAlist)
+    select(masterdemoid, redcap_event_name, paste0("ssi_",c(1:19),"_worst"),paste0("ssi_",c(1:19),"_curr"))
   
   df <- df %>% 
     mutate(
