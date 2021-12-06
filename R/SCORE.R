@@ -23,27 +23,28 @@ bsrc.score<-function(df=NULL,formname=NULL,...){
 #Clinical
 #SSI scoring
 score.ssi<-function(df=NULL){
-  #Remove those that are ONLY missing
-  df<-df[which(rowSums(is.na(df[c(paste0("ssi_",c(1:19),"_worst"),paste("ssi_",1:19, "_curr", sep=""))]) | 
-                         df[c(paste0("ssi_",c(1:19),"_worst"),paste("ssi_",1:19, "_curr", sep=""))]=="")<38),]
-  #Change values to NAs/0s
-  suppressWarnings(df <- df %>% 
-                     mutate_at(vars(paste0("ssi_",c(6:19),"_worst"),paste("ssi_",6:19, "_curr", sep="")),~replace(.,.=="na"|.=="",0)) %>%
-                     mutate_at(vars(paste0("ssi_",c(6:19),"_worst"),paste("ssi_",6:19, "_curr", sep="")),~replace(.,.=="dk"|.=="refuse",NA)) %>%
-                     mutate_at(vars(paste0("ssi_",c(1:5),"_worst"),paste("ssi_",1:5, "_curr", sep="")),~replace(.,.=="na"|.=="dk"|.=="refuse",NA)) %>% 
-                     mutate_at(vars(paste0("ssi_",c(1:19),"_worst"),paste("ssi_",1:19, "_curr", sep="")), ~as.integer(.)))
-  #Score
+  df <- df %>% 
+    # NA/na = 0, items 6-19
+    mutate_at(vars(paste0("ssi_",c(6:19),"_worst"),paste0("ssi_",c(6:19),"_curr")),~replace(.,is.na(.)|.=="na",0)) %>%
+    # dk/refuse = NA, items 6-19
+    mutate_at(vars(paste0("ssi_",c(6:19),"_worst"),paste0("ssi_",c(6:19),"_curr")),~replace(.,.=="dk"|.=="refuse",NA)) %>%
+    # dk/refuse/na/NA = NA, items 1-5
+    mutate_at(vars(paste0("ssi_",c(1:5),"_worst"),paste0("ssi_",c(1:5),"_curr")),~replace(.,.=="na"|.=="dk"|.=="refuse",NA)) %>% 
+    mutate_at(vars(paste0("ssi_",c(1:19),"_worst"),paste0("ssi_",c(1:19),"_curr")), ~as.integer(.)) %>%  # convert them to integer for scoring in the next step 
+    select(masterdemoid, redcap_event_name, paste0("ssi_",c(1:19),"_worst"),paste0("ssi_",c(1:19),"_curr")) %>% 
+    filter(masterdemoid %in% ID_DNAlist)
+  
   df <- df %>% 
     mutate(
-      SSI_worst_s = ifelse(rowSums(is.na(df[paste0("ssi_",c(1:19),"_worst")]))==0,
-                           rowSums(df[paste0("ssi_",c(1:19),"_worst")]), 
-                           ifelse(rowSums(is.na(df[paste0("ssi_",c(1:19),"_worst")])) == 1, 
-                                  round(rowSums(df[paste0("ssi_",c(1:19),"_worst")], na.rm = T)*19/18, digits = 0), NA)),
-      SSI_current_s = ifelse(rowSums(is.na(df[paste0("ssi_",c(1:19),"_curr")]))==0,
-                             rowSums(df[paste0("ssi_",c(1:19),"_curr")]), 
-                             ifelse(rowSums(is.na(df[paste0("ssi_",c(1:19),"_curr")])) == 1, 
-                                    round(rowSums(df[paste0("ssi_",c(1:19),"_curr")], na.rm = T)*19/18, digits = 0), NA))
-    )
+      SSI_current = ifelse(rowSums(is.na(df[paste0("ssi_",c(1:19),"_curr")]))==0,
+                           rowSums(df[paste0("ssi_",c(1:19),"_curr")]), 
+                           ifelse(rowSums(is.na(df[paste0("ssi_",c(1:19),"_curr")])) == 1, 
+                                  round(rowSums(df[paste0("ssi_",c(1:19),"_curr")], na.rm = T)*19/18, digits = 0), NA))) %>% 
+    mutate(
+      SSI_worst = ifelse(rowSums(is.na(df[paste0("ssi_",c(1:19),"_worst")]))==0,
+                         rowSums(df[paste0("ssi_",c(1:19),"_worst")]), 
+                         ifelse(rowSums(is.na(df[paste0("ssi_",c(1:19),"_worst")])) == 1, 
+                                round(rowSums(df[paste0("ssi_",c(1:19),"_worst")], na.rm = T)*19/18, digits = 0), NA)))
   return(df)
 }
 
