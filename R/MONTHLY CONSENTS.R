@@ -26,9 +26,9 @@ p3.monthly.consent<-function(enddate= Sys.Date(), grabnew=T){
     filter(registration_ptcstat___protect3==1) %>% # filter pts in p3
     mutate(con_month = month(ymd(reg_condate_protect3)), 
            con_year = year(ymd(reg_condate_protect3))) %>%  # extract consent month and year
-    mutate(cur_month = month(ymd(Sys.Date())),
+    mutate(cur_month = month(ymd(enddate)),
            last_month = cur_month - 1,
-           cur_year = year(ymd(Sys.Date()))) 
+           cur_year = year(ymd(enddate))) 
   
   P3_this_month <- P3 %>% 
     filter(con_month == cur_month & con_year==cur_year) # filter current month's pts
@@ -36,7 +36,15 @@ p3.monthly.consent<-function(enddate= Sys.Date(), grabnew=T){
   P3_last_month <- P3 %>% 
     filter(con_month == last_month & con_year==cur_year) # filter current month's pts
   
-  cat("Today's date: ", Sys.Date())
-  cat("This month consents: ", paste0(P3_this_month$registration_initials, collapse = ", "))
-  cat("Last month consents: ", paste0(P3_last_month$registration_initials, collapse = ", "))
+  # cat("Today's date: ", Sys.Date())
+  # cat("This month consents: ", paste0(P3_this_month$registration_initials, collapse = ", "))
+  # cat("Last month consents: ", paste0(P3_last_month$registration_initials, collapse = ", "))
+  # Print monthly consent
+  message("Monthly consents below (update: ", Sys.Date(), "): ")
+  cat("This month consents: ")
+  cat(paste0(P3_this_month$registration_initials, collapse = ", "))
+  cat("\n")
+  cat("Last month consents: ")
+  cat(paste0(P3_last_month$registration_initials, collapse = ", "))
+  cat("\n")  
 }
