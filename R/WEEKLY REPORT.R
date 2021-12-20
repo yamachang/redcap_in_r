@@ -346,10 +346,28 @@ p3.weekly.report<-function(enddate= Sys.Date(), grabnew=T){
       df[which(!is.na(df$`This month`) | !is.na(df$`Next month`)),]->df
       return(df)}
   as.data.frame(p2)->p2
-  fu_schedule(p2, x=2, IDE=F)->p2
+  
+  if(nrow(p2)!=0){
+    fu_schedule(p2, x=2, IDE=F)->p2
+  } else {
+      p2 -> p2
+    }
+  
   #Protect 3's also in Protect 2 follow old protect 2 schedule of followups
-  fu_schedule(p2p3, x=2, threemo = F)->p2p3
-  fu_schedule(p3, x=3)->p3
+  
+  if(nrow(p2p3)!=0){
+    fu_schedule(p2p3, x=2, threemo = F)->p2p3
+  } else {
+    p2p3 -> p2p3
+  }
+  
+  if(nrow(p3)!=0){
+    fu_schedule(p3, x=3)->p3
+  } else {
+    p3 -> p3
+  }
+  
+  
   
 #Add variable for which followup
   if(nrow(p2)>0){p2$followup<-"PROTECT2"}
