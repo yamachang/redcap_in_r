@@ -10,7 +10,7 @@ p3.weekly.report<-function(enddate= Sys.Date(), grabnew=T){
   map <- bsrc.getIDDateMap(db=pt)
     map<-bsrc.findid(map, idmap=idmap, "registration_redcapid")
     map<-map %>% select(masterdemoid,redcap_event_name,date)
-
+table(map$redcap_event_name)
 # #Check p2 people not in p3 yet (whenever there are 0 people, can remove p2)
 #     md$data %>% filter(registration_ptcstat___protect2==1)->p2
 #     p2 %>% filter(registration_ptcstat___protect3==0 & 
@@ -391,15 +391,21 @@ p3.weekly.report<-function(enddate= Sys.Date(), grabnew=T){
   ymd(p3$reg_condate_protect2)->p3$reg_condate_protect2
   merge(merge(p2,p2p3,all=T),p3,all=T)->fus
   
-  
 #Get last visit date and assessor
   as.Date(map$date)->map$date
-  map %>% group_by(masterdemoid) %>% filter(date==max(date))->map
+  map %>% group_by(masterdemoid) %>% 
+    filter(str_detect(redcap_event_name, "baseline|month|year|additional")) %>% 
+    filter(date==max(date))->map
   assessdf<-pro %>% select(masterdemoid, redcap_event_name,bq_assessor,fuq_assessor)
   merge(assessdf, map, by=c("masterdemoid","redcap_event_name"),all.y=T)->assessdf
-  assessdf %>% mutate(assessor=ifelse(!is.na(fuq_assessor),fuq_assessor,bq_assessor))->assessdf
+  assessdf %>% mutate(assessor=ifelse(!is.na(fuq_assessor),fuq_assessor,bq_assessor)) %>% 
+    filter(str_detect(redcap_event_name, "baseline|month|year|additional")) ->assessdf
   assessdf$assessor[match(fus$masterdemoid,assessdf$masterdemoid)]->fus$assessor
   assessdf$date[match(fus$masterdemoid,assessdf$masterdemoid)]->fus$lastseen_date
+  
+  # Test/check
+  #assessdf440258 <- assessdf %>% filter(masterdemoid == 440258) # Snake game doesn't have assessor --> Only select baseline, month, year
+  #assessdf440387 <- assessdf %>% filter(masterdemoid == 440387)
   
   #Assessor numbers to replace
   as.character(fus$assessor)->fus$assessor
