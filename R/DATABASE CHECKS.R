@@ -1,4 +1,4 @@
-bsrc.behav_task_check<-function(boxpath=paste("/Users/",Sys.getenv("USER"),"/Box/skinner/data/Behavioral",sep=""),
+bsrc.behav_task_check<-function(boxpath= "~/OneDrive - University of Pittsburgh/PROTECT Box/data/Behavioral",
                                 online=T, task=c("snake","supplement"), md=md, pt=pt, idmap=idmap){
   #Libraries
     library(lubridate); library(pkgcond)
